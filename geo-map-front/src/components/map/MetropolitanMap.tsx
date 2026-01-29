@@ -11,21 +11,7 @@ import type { GeoJSONFeatureCollection, GeoJSONFeature } from "@/types/map";
 // Import Seoul dong-level GeoJSON data
 import seoulData from "@/data/seoul-dong.json";
 
-interface MetropolitanMapProps {
-  width?: string;
-  height?: string;
-  className?: string;
-  onRegionClick?: (feature: GeoJSONFeature) => void;
-  onRegionHover?: (feature: GeoJSONFeature | null) => void;
-}
-
-export function MetropolitanMap({
-  width = "100%",
-  height = "100vh",
-  className,
-  onRegionClick,
-  onRegionHover,
-}: MetropolitanMapProps) {
+export function MetropolitanMap() {
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
 
   // Zustand store
@@ -59,22 +45,19 @@ export function MetropolitanMap({
   const handleMouseOver = useCallback(
     (feature: GeoJSONFeature) => {
       setHoveredRegion(feature);
-      onRegionHover?.(feature);
     },
-    [setHoveredRegion, onRegionHover]
+    [setHoveredRegion]
   );
 
   const handleMouseOut = useCallback(() => {
     setHoveredRegion(null);
-    onRegionHover?.(null);
-  }, [setHoveredRegion, onRegionHover]);
+  }, [setHoveredRegion]);
 
   const handleClick = useCallback(
     (feature: GeoJSONFeature) => {
       setSelectedRegion(feature);
-      onRegionClick?.(feature);
     },
-    [setSelectedRegion, onRegionClick]
+    [setSelectedRegion]
   );
 
   // Setup polygons with events
@@ -92,7 +75,7 @@ export function MetropolitanMap({
 
   return (
     <div className="relative">
-      <div ref={mapRef} className={className} style={{ width, height }} />
+      <div ref={mapRef} style={{ width: "100%", height: "100vh" }} />
 
       {/* Region tooltip at centroid */}
       <RegionTooltip mapInstance={mapInstance} />
