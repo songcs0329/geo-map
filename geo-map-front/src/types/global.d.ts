@@ -4,4 +4,10 @@ declare global {
   }
 }
 
+// Allow importing GeoJSON files (as .json)
+declare module "@/data/*.json" {
+  const value: import("./map").GeoJSONFeatureCollection;
+  export default value;
+}
+
 export {};

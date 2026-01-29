@@ -1,5 +1,5 @@
-import { NaverMap } from "@/components/map/NaverMap";
+import { MetropolitanMap } from "@/components/map/MetropolitanMap";
 
 export default function Home() {
-  return <NaverMap height="100vh" />;
+  return <MetropolitanMap height="100vh" />;
 }
