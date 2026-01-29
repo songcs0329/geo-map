@@ -1,23 +1,5 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { QueryProvider } from "@/providers/QueryProvider";
 import "./globals.css";
-import { Providers } from "@/providers";
-import { Toaster } from "@/components/ui/sonner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Blog Geo Map",
-  description: "A modern blog application with geo mapping features",
-};
 
 export default function RootLayout({
   children,
@@ -25,14 +7,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>
-          {children}
-          <Toaster />
-        </Providers>
+    <html lang="en">
+      <body>
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
