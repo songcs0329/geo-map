@@ -2,7 +2,7 @@
 
 import useMapStore from "@/stores/useMapStore";
 import { GeoJSONFeature } from "@/types/map";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 /**
@@ -59,17 +59,21 @@ function useNaverMap<T extends HTMLElement>(options: UseNaverMapOptions = {}) {
   const searchParams = useSearchParams();
 
   // URL searchParams에서 값이 있으면 사용, 없으면 기본값
-  const lat = searchParams.get("lat");
-  const lng = searchParams.get("lng");
-  const zoomParam = searchParams.get("zoom");
-
-  const center = lat && lng
-    ? { lat: parseFloat(lat), lng: parseFloat(lng) }
+  const mapOptions = useMemo(() => {
+    const query = Object.fromEntries(searchParams);
+    const center = query.lat && query.lng
+    ? { lat: parseFloat(query.lat), lng: parseFloat(query.lng) }
     : defaultCenter;
-  const zoom = zoomParam ? parseInt(zoomParam, 10) : defaultZoom;
+    const zoom = query.zoom ? parseInt(query.zoom, 10) : defaultZoom;
+
+    return {
+      center,
+      zoom
+    }
+  }, [searchParams, defaultCenter, defaultZoom]);
 
   // 초기값을 ref로 캡처 (이후 URL 변경 시 재초기화 방지)
-  const initialOptionsRef = useRef({ center, zoom });
+  const initialOptionsRef = useRef(mapOptions);
 
   useEffect(() => {
     if (!NAVER_MAP_CLIENT_ID || !mapRef.current) return;
