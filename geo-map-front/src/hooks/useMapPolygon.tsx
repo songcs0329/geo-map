@@ -4,10 +4,9 @@ import { useEffect, useRef, useCallback, useMemo } from "react";
 import type {
   GeoJSONFeatureCollection,
   GeoJSONFeature,
-  PolygonInstance,
   AdminLevel,
-  DistrictStyles,
-} from "@/types/map";
+} from "@/types/shared/geojson.types";
+import type { PolygonInstance, DistrictStyles } from "@/types/map";
 import { NAVER_MAP_EVENTS } from "@/lib/constants";
 import {
   applyStyle,

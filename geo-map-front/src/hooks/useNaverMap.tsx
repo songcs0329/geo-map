@@ -1,7 +1,7 @@
 "use client";
 
 import useMapStore from "@/stores/useMapStore";
-import { GeoJSONFeature } from "@/types/map";
+import type { GeoJSONFeature } from "@/types/shared/geojson.types";
 import { useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 

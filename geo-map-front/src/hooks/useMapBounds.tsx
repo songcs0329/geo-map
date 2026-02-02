@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { debounce } from "lodash-es";
-import type { AdminLevel } from "@/types/map";
+import type { AdminLevel } from "@/types/shared/geojson.types";
 import { getAdminLevelByZoom } from "@/lib/geoUtils";
 import { MAP_CONFIG, NAVER_MAP_EVENTS } from "@/lib/constants";
 
