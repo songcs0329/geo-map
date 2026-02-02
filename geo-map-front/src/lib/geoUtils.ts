@@ -2,9 +2,8 @@ import type {
   GeoJSONFeature,
   GeoJSONFeatureCollection,
   AdminLevel,
-  FeatureBounds,
-  PolygonStyle,
-} from "@/types/map";
+} from "@/types/shared/geojson.types";
+import type { FeatureBounds, PolygonStyle } from "@/types/map";
 import { POLYGON_STYLES, SGG_PALETTE, SIDO_COLORS, ZOOM_LEVELS } from "./constants";
 
 /**
