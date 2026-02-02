@@ -94,7 +94,7 @@ function useNaverMap<T extends HTMLElement>(options: UseNaverMapOptions = {}) {
           initialCenter.lng
         ),
         zoom: initialZoom,
-        minZoom: 12,
+        minZoom: 9, // 시/도 레벨까지 축소 가능
       });
 
       setMapInstance(instance);

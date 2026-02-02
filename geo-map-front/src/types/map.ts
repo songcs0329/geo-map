@@ -1,4 +1,9 @@
-// GeoJSON Types (raqoon886/Local_HangJeongDong format)
+// Admin Level Type
+export type AdminLevel = "sido" | "sgg" | "dong";
+
+/**
+ * GeoJSON Types (https://github.com/raqoon886/Local_HangJeongDong)
+ *  */ 
 export interface GeoJSONFeatureProperties {
   OBJECTID: number;
   adm_nm: string; // 행정구역명 (서울특별시 종로구 사직동)
@@ -27,6 +32,14 @@ export interface GeoJSONFeatureCollection {
   features: GeoJSONFeature[];
 }
 
+// Feature Bounds (for intersection check)
+export interface FeatureBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+}
+
 // Polygon Style Types
 export interface PolygonStyle {
   fillColor: string;
@@ -36,11 +49,10 @@ export interface PolygonStyle {
   strokeOpacity: number;
 }
 
-export interface PolygonRegionConfig {
-  code: string;
+export interface DistrictStyles {
   style: PolygonStyle;
   hoverStyle: PolygonStyle;
-  clickStyle?: PolygonStyle;
+  clickStyle: PolygonStyle;
 }
 
 export interface PolygonInstance {

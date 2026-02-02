@@ -1,112 +1,41 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import type {
   GeoJSONFeatureCollection,
   GeoJSONFeature,
-  PolygonStyle,
   PolygonInstance,
+  AdminLevel,
+  DistrictStyles,
 } from "@/types/map";
-import { DISTRICT_COLORS, POLYGON_STYLES } from "@/lib/constants";
-
-/**
- * 구(sggnm) 기준으로 폴리곤 색상 가져오기
- */
-export function getDistrictColor(feature: GeoJSONFeature): string {
-  const district = feature.properties.sggnm;
-  return DISTRICT_COLORS[district] || "#3B82F6"; // 기본값: 파란색
-}
-
-/**
- * 구 기준 스타일 생성
- */
-export function createDistrictStyles(feature: GeoJSONFeature): {
-  style: PolygonStyle;
-  hoverStyle: PolygonStyle;
-  clickStyle: PolygonStyle;
-} {
-  const fillColor = getDistrictColor(feature);
-  const baseStroke = {
-    strokeColor: POLYGON_STYLES.STROKE_COLOR,
-    strokeWeight: POLYGON_STYLES.STROKE_WEIGHT,
-    strokeOpacity: 0.8,
-  };
-
-  return {
-    style: {
-      fillColor,
-      fillOpacity: POLYGON_STYLES.DEFAULT_FILL_OPACITY,
-      ...baseStroke,
-    },
-    hoverStyle: {
-      fillColor,
-      fillOpacity: 0.6,
-      ...baseStroke,
-    },
-    clickStyle: {
-      fillColor,
-      fillOpacity: 0.8,
-      ...baseStroke,
-    },
-  };
-}
-
-export function convertCoordinatesToPaths(
-  coordinates: number[][][] | number[][][][],
-  geometryType: "Polygon" | "MultiPolygon"
-): naver.maps.ArrayOfCoords[] {
-  const paths: naver.maps.ArrayOfCoords[] = [];
-
-  if (geometryType === "Polygon") {
-    const rings = coordinates as number[][][];
-    for (const ring of rings) {
-      const path: naver.maps.LatLng[] = ring.map(
-        ([lng, lat]) => new window.naver.maps.LatLng(lat, lng)
-      );
-      paths.push(path);
-    }
-  } else {
-    const polygons = coordinates as number[][][][];
-    for (const polygon of polygons) {
-      for (const ring of polygon) {
-        const path: naver.maps.LatLng[] = ring.map(
-          ([lng, lat]) => new window.naver.maps.LatLng(lat, lng)
-        );
-        paths.push(path);
-      }
-    }
-  }
-
-  return paths;
-}
-
-export function applyStyle(polygon: naver.maps.Polygon, style: PolygonStyle): void {
-  const p = polygon as any;
-  p.setStyles({
-    fillColor: style.fillColor,
-    fillOpacity: style.fillOpacity,
-    strokeColor: style.strokeColor,
-    strokeWeight: style.strokeWeight,
-    strokeOpacity: style.strokeOpacity,
-  });
-}
+import { NAVER_MAP_EVENTS } from "@/lib/constants";
+import {
+  applyStyle,
+  convertCoordinatesToPaths,
+  createDistrictStyles,
+  filterFeaturesByBounds,
+} from "@/lib/geoUtils";
 
 interface UseMapPolygonOptions {
   map: naver.maps.Map | null;
   geoJSON: GeoJSONFeatureCollection | null;
+  bounds: naver.maps.LatLngBounds | null;
+  adminLevel: AdminLevel;
   onClick: (feature: GeoJSONFeature) => void;
 }
 
 function useMapPolygon({
   map,
   geoJSON,
+  bounds,
+  adminLevel,
   onClick,
 }: UseMapPolygonOptions) {
   const polygonInstancesRef = useRef<PolygonInstance[]>([]);
   const selectedPolygonRef = useRef<naver.maps.Polygon | null>(null);
-  const featureStylesRef = useRef<
-    Map<naver.maps.Polygon, { style: PolygonStyle; hoverStyle: PolygonStyle; clickStyle: PolygonStyle }>
-  >(new Map());
+  const featureStylesRef = useRef<Map<naver.maps.Polygon, DistrictStyles>>(
+    new Map()
+  );
 
   const clearPolygons = useCallback(() => {
     for (const instance of polygonInstancesRef.current) {
@@ -125,7 +54,7 @@ function useMapPolygon({
       if (!map || !window.naver?.maps) return null;
 
       const { geometry } = feature;
-      const styles = createDistrictStyles(feature);
+      const styles = createDistrictStyles(feature, adminLevel);
 
       const paths = convertCoordinatesToPaths(
         geometry.coordinates,
@@ -151,7 +80,7 @@ function useMapPolygon({
       // hover 이벤트
       const mouseOverListener = naver.maps.Event.addListener(
         polygon,
-        "mouseover",
+        NAVER_MAP_EVENTS.MOUSEOVER,
         () => {
           if (selectedPolygonRef.current !== polygon) {
             applyStyle(polygon, styles.hoverStyle);
@@ -162,7 +91,7 @@ function useMapPolygon({
 
       const mouseOutListener = naver.maps.Event.addListener(
         polygon,
-        "mouseout",
+        NAVER_MAP_EVENTS.MOUSEOUT,
         () => {
           if (selectedPolygonRef.current === polygon) {
             applyStyle(polygon, styles.clickStyle);
@@ -176,11 +105,16 @@ function useMapPolygon({
       // click 이벤트
       const clickListener = naver.maps.Event.addListener(
         polygon,
-        "click",
+        NAVER_MAP_EVENTS.CLICK,
         () => {
           // 이전 선택 복원
-          if (selectedPolygonRef.current && selectedPolygonRef.current !== polygon) {
-            const prevStyles = featureStylesRef.current.get(selectedPolygonRef.current);
+          if (
+            selectedPolygonRef.current &&
+            selectedPolygonRef.current !== polygon
+          ) {
+            const prevStyles = featureStylesRef.current.get(
+              selectedPolygonRef.current
+            );
             if (prevStyles) {
               applyStyle(selectedPolygonRef.current, prevStyles.style);
             }
@@ -202,15 +136,21 @@ function useMapPolygon({
 
       return { polygon, feature, listeners };
     },
-    [map, onClick]
+    [map, adminLevel, onClick]
   );
 
+  // bounds로 필터링된 features 계산
+  const visibleFeatures = useMemo(() => {
+    if (!geoJSON) return [];
+    return filterFeaturesByBounds(geoJSON.features, bounds);
+  }, [geoJSON, bounds]);
+
   useEffect(() => {
-    if (!map || !geoJSON || !window.naver?.maps) return;
+    if (!map || !window.naver?.maps) return;
 
     clearPolygons();
 
-    for (const feature of geoJSON.features) {
+    for (const feature of visibleFeatures) {
       const instance = createPolygon(feature);
       if (instance) {
         polygonInstancesRef.current.push(instance);
@@ -220,7 +160,7 @@ function useMapPolygon({
     return () => {
       clearPolygons();
     };
-  }, [map, geoJSON, createPolygon, clearPolygons]);
+  }, [map, visibleFeatures, createPolygon, clearPolygons]);
 
   return {
     polygonInstancesRef,

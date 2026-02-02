@@ -7,75 +7,70 @@ export const MAP_CONFIG = {
 } as const;
 
 /**
+ * 줌 레벨별 행정구역 표시 기준
+ * - sido: 시/도 레벨 (0~9)
+ * - sgg: 시군구 레벨 (10~12)
+ * - dong: 동 레벨 (13~21)
+ */
+export const ZOOM_LEVELS = {
+  SIDO: { min: 0, max: 9 },
+  SGG: { min: 10, max: 12 },
+  DONG: { min: 13, max: 21 },
+} as const;
+
+/**
  * 폴리곤 스타일 설정
  */
 export const POLYGON_STYLES = {
   DEFAULT_FILL_OPACITY: 0.4,
   SELECTED_FILL_OPACITY: 0.7,
   STROKE_COLOR: "#FFFFFF",
-  STROKE_WEIGHT: 1,
-  HOVER_STROKE_COLOR: "#000000",
-  HOVER_STROKE_WEIGHT: 1,
+  STROKE_WEIGHT: 2,
 } as const;
 
 /**
- * 서울시 25개 구 색상 매핑
+ * 시/도 색상 매핑 (sido 코드 기준)
  */
-export const DISTRICT_COLORS: Record<string, string> = {
-  종로구: "#FF6B6B",
-  중구: "#4ECDC4",
-  용산구: "#45B7D1",
-  성동구: "#96CEB4",
-  광진구: "#FFEAA7",
-  동대문구: "#DDA0DD",
-  중랑구: "#98D8C8",
-  성북구: "#F7DC6F",
-  강북구: "#BB8FCE",
-  도봉구: "#85C1E9",
-  노원구: "#F8B500",
-  은평구: "#82E0AA",
-  서대문구: "#F1948A",
-  마포구: "#85929E",
-  양천구: "#73C6B6",
-  강서구: "#F5B041",
-  구로구: "#AF7AC5",
-  금천구: "#5DADE2",
-  영등포구: "#58D68D",
-  동작구: "#EC7063",
-  관악구: "#A569BD",
-  서초구: "#48C9B0",
-  강남구: "#5499C7",
-  송파구: "#52BE80",
-  강동구: "#F4D03F",
+export const SIDO_COLORS: Record<string, string> = {
+  "11": "#FF6B6B", // 서울특별시
+  "26": "#4ECDC4", // 부산광역시
+  "27": "#45B7D1", // 대구광역시
+  "28": "#96CEB4", // 인천광역시
+  "29": "#FFEAA7", // 광주광역시
+  "30": "#DDA0DD", // 대전광역시
+  "31": "#98D8C8", // 울산광역시
+  "36": "#F7DC6F", // 세종특별자치시
+  "41": "#BB8FCE", // 경기도
+  "42": "#85C1E9", // 강원도
+  "43": "#F8B500", // 충청북도
+  "44": "#82E0AA", // 충청남도
+  "45": "#F1948A", // 전라북도
+  "46": "#85929E", // 전라남도
+  "47": "#73C6B6", // 경상북도
+  "48": "#F5B041", // 경상남도
+  "50": "#AF7AC5", // 제주특별자치도
 } as const;
 
 /**
- * 구 코드별 색상 (sgg 코드 앞 5자리 기준)
+ * 해시 기반 색상 생성용 팔레트 (sgg 코드용)
  */
-export const DISTRICT_CODE_COLORS: Record<string, string> = {
-  "11110": "#FF6B6B", // 종로구
-  "11140": "#4ECDC4", // 중구
-  "11170": "#45B7D1", // 용산구
-  "11200": "#96CEB4", // 성동구
-  "11215": "#FFEAA7", // 광진구
-  "11230": "#DDA0DD", // 동대문구
-  "11260": "#98D8C8", // 중랑구
-  "11290": "#F7DC6F", // 성북구
-  "11305": "#BB8FCE", // 강북구
-  "11320": "#85C1E9", // 도봉구
-  "11350": "#F8B500", // 노원구
-  "11380": "#82E0AA", // 은평구
-  "11410": "#F1948A", // 서대문구
-  "11440": "#85929E", // 마포구
-  "11470": "#73C6B6", // 양천구
-  "11500": "#F5B041", // 강서구
-  "11530": "#AF7AC5", // 구로구
-  "11545": "#5DADE2", // 금천구
-  "11560": "#58D68D", // 영등포구
-  "11590": "#EC7063", // 동작구
-  "11620": "#A569BD", // 관악구
-  "11650": "#48C9B0", // 서초구
-  "11680": "#5499C7", // 강남구
-  "11710": "#52BE80", // 송파구
-  "11740": "#F4D03F", // 강동구
+export const SGG_PALETTE = [
+  "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
+  "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9",
+  "#F8B500", "#82E0AA", "#F1948A", "#85929E", "#73C6B6",
+  "#F5B041", "#AF7AC5", "#5DADE2", "#58D68D", "#EC7063",
+  "#A569BD", "#48C9B0", "#5499C7", "#52BE80", "#F4D03F",
+] as const;
+
+/**
+ * Naver Maps 이벤트명
+ */
+export const NAVER_MAP_EVENTS = {
+  // Map 이벤트
+  BOUNDS_CHANGED: "bounds_changed",
+  ZOOM_CHANGED: "zoom_changed",
+  // Polygon/Overlay 이벤트
+  CLICK: "click",
+  MOUSEOVER: "mouseover",
+  MOUSEOUT: "mouseout",
 } as const;

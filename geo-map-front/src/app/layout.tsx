@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { QueryProvider } from "@/components/layout/QueryProvider";
-import { PolygonMap } from "@/components/layout/PolygonMap";
+import QueryProvider from "@/components/layout/QueryProvider";
+import PolygonMap from "@/components/layout/PolygonMap";
 import "./globals.css";
 
 export default function RootLayout({

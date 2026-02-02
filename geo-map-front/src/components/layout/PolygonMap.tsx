@@ -4,21 +4,23 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import useMapPolygon from "@/hooks/useMapPolygon";
 import useNaverMap, { calculateCentroid } from "@/hooks/useNaverMap";
-import { MAP_CONFIG } from "@/lib/constants";
-import type { GeoJSONFeatureCollection, GeoJSONFeature } from "@/types/map";
-
-// Import Seoul dong-level GeoJSON data
-import seoulData from "@/data/seoul-dong.json";
+import useMapBounds from "@/hooks/useMapBounds";
+import useAdminGeoJSON from "@/hooks/useAdminGeoJSON";
+import { MAP_CONFIG, ZOOM_LEVELS } from "@/lib/constants";
+import type { GeoJSONFeature } from "@/types/map";
 import useMapStore from "@/stores/useMapStore";
 
-export function PolygonMap() {
+export default function PolygonMap() {
   const router = useRouter();
 
   // Zustand store
   const mapInstance = useMapStore((state) => state.mapInstance);
 
-  // Use Seoul dong data
-  const geoJSON = seoulData as GeoJSONFeatureCollection;
+  // 지도 bounds/zoom 상태 추적
+  const { bounds, adminLevel } = useMapBounds(mapInstance);
+
+  // 행정 레벨에 따른 GeoJSON 데이터 로드
+  const { data: geoJSON } = useAdminGeoJSON(adminLevel);
 
   // useNaverMap 내부에서 searchParams를 확인하여 center/zoom 결정
   const mapRef = useNaverMap<HTMLDivElement>({
@@ -26,33 +28,41 @@ export function PolygonMap() {
     zoom: MAP_CONFIG.DEFAULT_ZOOM,
   });
 
-  // 클릭 핸들러: 지도 중심 이동 + 라우터 이동
+  // 클릭 핸들러: 동 레벨이면 라우터 이동, 아니면 줌인
   const handleClick = useCallback(
     (feature: GeoJSONFeature) => {
       if (!mapInstance) return;
 
-      // 클릭한 폴리곤의 중심으로 지도 이동
       const centroid = calculateCentroid(feature);
       const latlng = new window.naver.maps.LatLng(centroid.lat, centroid.lng);
-      mapInstance.panTo(latlng, { duration: 300 });
 
-      // 다이나믹 라우트로 이동
-      const searchParams = new URLSearchParams({
-        lat: centroid.lat.toString(),
-        lng: centroid.lng.toString(),
-        zoom: mapInstance.getZoom().toString(),
-      });
-      router.push(
-        `/search/${feature.properties.adm_cd}?${searchParams.toString()}`
-      );
+      // 동 레벨일 때만 라우터 이동
+      if (adminLevel === "dong") {
+        mapInstance.panTo(latlng, { duration: 600 });
+        const searchParams = new URLSearchParams({
+          lat: centroid.lat.toString(),
+          lng: centroid.lng.toString(),
+          zoom: mapInstance.getZoom().toString(),
+        });
+        router.push(
+          `/search/${feature.properties.adm_cd}?${searchParams.toString()}`
+        );
+      } else {
+        // sido/sgg 레벨이면 다음 레벨로 줌인
+        const nextZoom =
+          adminLevel === "sido" ? ZOOM_LEVELS.SGG.min : ZOOM_LEVELS.DONG.min;
+        mapInstance.morph(latlng, nextZoom, { duration: 600 });
+      }
     },
-    [mapInstance, router]
+    [mapInstance, router, adminLevel]
   );
 
-  // Setup polygons with events
+  // Setup polygons with events (bounds 기반 필터링)
   useMapPolygon({
     map: mapInstance,
     geoJSON,
+    bounds,
+    adminLevel,
     onClick: handleClick,
   });
 
