@@ -5,7 +5,6 @@ import type {
   GeoJSONFeatureCollection,
   GeoJSONFeature,
   PolygonStyle,
-  PolygonEventHandlers,
   PolygonInstance,
 } from "@/types/map";
 import { DISTRICT_COLORS, POLYGON_STYLES } from "@/lib/constants";
@@ -13,7 +12,7 @@ import { DISTRICT_COLORS, POLYGON_STYLES } from "@/lib/constants";
 /**
  * 구(sggnm) 기준으로 폴리곤 색상 가져오기
  */
-function getDistrictColor(feature: GeoJSONFeature): string {
+export function getDistrictColor(feature: GeoJSONFeature): string {
   const district = feature.properties.sggnm;
   return DISTRICT_COLORS[district] || "#3B82F6"; // 기본값: 파란색
 }
@@ -21,47 +20,38 @@ function getDistrictColor(feature: GeoJSONFeature): string {
 /**
  * 구 기준 스타일 생성
  */
-function createDistrictStyles(feature: GeoJSONFeature): {
+export function createDistrictStyles(feature: GeoJSONFeature): {
   style: PolygonStyle;
   hoverStyle: PolygonStyle;
   clickStyle: PolygonStyle;
 } {
   const fillColor = getDistrictColor(feature);
+  const baseStroke = {
+    strokeColor: POLYGON_STYLES.STROKE_COLOR,
+    strokeWeight: POLYGON_STYLES.STROKE_WEIGHT,
+    strokeOpacity: 0.8,
+  };
 
   return {
     style: {
       fillColor,
       fillOpacity: POLYGON_STYLES.DEFAULT_FILL_OPACITY,
-      strokeColor: POLYGON_STYLES.STROKE_COLOR,
-      strokeWeight: POLYGON_STYLES.STROKE_WEIGHT,
-      strokeOpacity: 0.8,
+      ...baseStroke,
     },
     hoverStyle: {
       fillColor,
-      fillOpacity: POLYGON_STYLES.DEFAULT_FILL_OPACITY, // 채우기는 그대로
-      strokeColor: POLYGON_STYLES.HOVER_STROKE_COLOR, // 라인만 강조
-      strokeWeight: POLYGON_STYLES.HOVER_STROKE_WEIGHT,
-      strokeOpacity: 1,
+      fillOpacity: 0.6,
+      ...baseStroke,
     },
     clickStyle: {
       fillColor,
-      fillOpacity: POLYGON_STYLES.SELECTED_FILL_OPACITY,
-      strokeColor: "#000000",
-      strokeWeight: 3,
-      strokeOpacity: 1,
+      fillOpacity: 0.8,
+      ...baseStroke,
     },
   };
 }
 
-interface UseMapPolygonOptions {
-  map: naver.maps.Map | null;
-  geoJSON: GeoJSONFeatureCollection | null;
-  eventHandlers?: PolygonEventHandlers;
-  enableHover?: boolean;
-  enableClick?: boolean;
-}
-
-function convertCoordinatesToPaths(
+export function convertCoordinatesToPaths(
   coordinates: number[][][] | number[][][][],
   geometryType: "Polygon" | "MultiPolygon"
 ): naver.maps.ArrayOfCoords[] {
@@ -90,8 +80,7 @@ function convertCoordinatesToPaths(
   return paths;
 }
 
-function applyStyle(polygon: naver.maps.Polygon, style: PolygonStyle): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function applyStyle(polygon: naver.maps.Polygon, style: PolygonStyle): void {
   const p = polygon as any;
   p.setStyles({
     fillColor: style.fillColor,
@@ -102,12 +91,16 @@ function applyStyle(polygon: naver.maps.Polygon, style: PolygonStyle): void {
   });
 }
 
-export function useMapPolygon({
+interface UseMapPolygonOptions {
+  map: naver.maps.Map | null;
+  geoJSON: GeoJSONFeatureCollection | null;
+  onClick: (feature: GeoJSONFeature) => void;
+}
+
+function useMapPolygon({
   map,
   geoJSON,
-  eventHandlers,
-  enableHover = true,
-  enableClick = true,
+  onClick,
 }: UseMapPolygonOptions) {
   const polygonInstancesRef = useRef<PolygonInstance[]>([]);
   const selectedPolygonRef = useRef<naver.maps.Polygon | null>(null);
@@ -155,65 +148,61 @@ export function useMapPolygon({
 
       const listeners: naver.maps.MapEventListener[] = [];
 
-      if (enableHover) {
-        const mouseOverListener = naver.maps.Event.addListener(
-          polygon,
-          "mouseover",
-          () => {
-            if (selectedPolygonRef.current !== polygon) {
-              applyStyle(polygon, styles.hoverStyle);
-            }
-            eventHandlers?.onMouseOver?.(feature, polygon);
+      // hover 이벤트
+      const mouseOverListener = naver.maps.Event.addListener(
+        polygon,
+        "mouseover",
+        () => {
+          if (selectedPolygonRef.current !== polygon) {
+            applyStyle(polygon, styles.hoverStyle);
           }
-        );
-        listeners.push(mouseOverListener);
+        }
+      );
+      listeners.push(mouseOverListener);
 
-        const mouseOutListener = naver.maps.Event.addListener(
-          polygon,
-          "mouseout",
-          () => {
-            if (selectedPolygonRef.current === polygon) {
-              applyStyle(polygon, styles.clickStyle);
-            } else {
-              applyStyle(polygon, styles.style);
-            }
-            eventHandlers?.onMouseOut?.(feature, polygon);
+      const mouseOutListener = naver.maps.Event.addListener(
+        polygon,
+        "mouseout",
+        () => {
+          if (selectedPolygonRef.current === polygon) {
+            applyStyle(polygon, styles.clickStyle);
+          } else {
+            applyStyle(polygon, styles.style);
           }
-        );
-        listeners.push(mouseOutListener);
-      }
+        }
+      );
+      listeners.push(mouseOutListener);
 
-      if (enableClick) {
-        const clickListener = naver.maps.Event.addListener(
-          polygon,
-          "click",
-          () => {
-            // 이전 선택 복원
-            if (selectedPolygonRef.current && selectedPolygonRef.current !== polygon) {
-              const prevStyles = featureStylesRef.current.get(selectedPolygonRef.current);
-              if (prevStyles) {
-                applyStyle(selectedPolygonRef.current, prevStyles.style);
-              }
+      // click 이벤트
+      const clickListener = naver.maps.Event.addListener(
+        polygon,
+        "click",
+        () => {
+          // 이전 선택 복원
+          if (selectedPolygonRef.current && selectedPolygonRef.current !== polygon) {
+            const prevStyles = featureStylesRef.current.get(selectedPolygonRef.current);
+            if (prevStyles) {
+              applyStyle(selectedPolygonRef.current, prevStyles.style);
             }
-
-            // 토글 선택
-            if (selectedPolygonRef.current === polygon) {
-              applyStyle(polygon, styles.style);
-              selectedPolygonRef.current = null;
-            } else {
-              applyStyle(polygon, styles.clickStyle);
-              selectedPolygonRef.current = polygon;
-            }
-
-            eventHandlers?.onClick?.(feature, polygon);
           }
-        );
-        listeners.push(clickListener);
-      }
+
+          // 토글 선택
+          if (selectedPolygonRef.current === polygon) {
+            applyStyle(polygon, styles.style);
+            selectedPolygonRef.current = null;
+          } else {
+            applyStyle(polygon, styles.clickStyle);
+            selectedPolygonRef.current = polygon;
+          }
+
+          onClick(feature);
+        }
+      );
+      listeners.push(clickListener);
 
       return { polygon, feature, listeners };
     },
-    [map, eventHandlers, enableHover, enableClick]
+    [map, onClick]
   );
 
   useEffect(() => {
@@ -239,3 +228,5 @@ export function useMapPolygon({
     clearPolygons,
   };
 }
+
+export default useMapPolygon;

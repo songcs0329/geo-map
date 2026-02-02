@@ -43,12 +43,6 @@ export interface PolygonRegionConfig {
   clickStyle?: PolygonStyle;
 }
 
-export interface PolygonEventHandlers {
-  onMouseOver?: (feature: GeoJSONFeature, polygon: naver.maps.Polygon) => void;
-  onMouseOut?: (feature: GeoJSONFeature, polygon: naver.maps.Polygon) => void;
-  onClick?: (feature: GeoJSONFeature, polygon: naver.maps.Polygon) => void;
-}
-
 export interface PolygonInstance {
   polygon: naver.maps.Polygon;
   feature: GeoJSONFeature;
