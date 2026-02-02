@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import useMapPolygon from "@/hooks/useMapPolygon";
 import useNaverMap, { calculateCentroid } from "@/hooks/useNaverMap";
 import useMapBounds from "@/hooks/useMapBounds";
-import useAdminGeoJSON from "@/hooks/useAdminGeoJSON";
+import useAdminGeoJSON from "@/hooks/useGetGeoJSON";
 import { MAP_CONFIG, ZOOM_LEVELS } from "@/lib/constants";
-import type { GeoJSONFeature } from "@/types/map";
+import type { GeoJSONFeature } from "@/types/shared/geojson.types";
 import useMapStore from "@/stores/useMapStore";
 
 export default function PolygonMap() {
