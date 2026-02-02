@@ -303,3 +303,8 @@ export function applyStyle(
     strokeOpacity: style.strokeOpacity,
   });
 }
+
+export function getRegionPrefix(address: string): string {
+  const parts = address.split(" ");
+  return parts[parts.length - 1];
+}
