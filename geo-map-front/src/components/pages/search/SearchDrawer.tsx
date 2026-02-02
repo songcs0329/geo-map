@@ -32,7 +32,7 @@ function SearchDrawer(props: SearchDrawerProps) {
     <Drawer open direction="left" onOpenChange={handleOpenChange}>
       <DrawerContent className="h-full w-100 sm:max-w-100">
         {region && <SearchFormHeader address={region.properties.adm_nm} />}
-        <div className="flex-1 overflow-auto bg-gray-50 p-4">
+        <div className="flex-1 overflow-auto bg-gray-50 p-4 scrollbar-hide">
           <SearchTabs keyword={keyword} sort={sort} />
         </div>
       </DrawerContent>
