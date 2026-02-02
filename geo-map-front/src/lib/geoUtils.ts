@@ -3,7 +3,7 @@ import type {
   GeoJSONFeatureCollection,
   AdminLevel,
 } from "@/types/shared/geojson.types";
-import type { FeatureBounds, PolygonStyle } from "@/types/map";
+import type { FeatureBounds, PolygonStyle } from "@/types/naver-map.types";
 import { POLYGON_STYLES, SGG_PALETTE, SIDO_COLORS, ZOOM_LEVELS } from "./constants";
 
 /**

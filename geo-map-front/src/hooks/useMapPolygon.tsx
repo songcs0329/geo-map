@@ -6,7 +6,7 @@ import type {
   GeoJSONFeature,
   AdminLevel,
 } from "@/types/shared/geojson.types";
-import type { PolygonInstance, DistrictStyles } from "@/types/map";
+import type { PolygonInstance, DistrictStyles } from "@/types/naver-map.types";
 import { NAVER_MAP_EVENTS } from "@/lib/constants";
 import {
   applyStyle,

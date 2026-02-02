@@ -6,7 +6,7 @@ declare global {
 
 // Allow importing GeoJSON files (as .json)
 declare module "@/data/*.json" {
-  const value: import("./map").GeoJSONFeatureCollection;
+  const value: import("./naver-map.types").GeoJSONFeatureCollection;
   export default value;
 }
 
