@@ -20,7 +20,7 @@
 ```bash
 # .env.local
 NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=your_naver_map_client_id
-NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_NAVER_MAP_CLIENT_SECRET=your_naver_map_client_secret
 ```
 
 ### 설치 및 실행
@@ -37,12 +37,12 @@ npm run dev
 
 ## 스크립트
 
-| 명령어 | 설명 |
-|--------|------|
-| `npm run dev` | 개발 서버 실행 |
-| `npm run build` | 프로덕션 빌드 |
-| `npm run start` | 프로덕션 서버 실행 |
-| `npm run lint` | ESLint 검사 |
+| 명령어               | 설명               |
+| -------------------- | ------------------ |
+| `npm run dev`        | 개발 서버 실행     |
+| `npm run build`      | 프로덕션 빌드      |
+| `npm run start`      | 프로덕션 서버 실행 |
+| `npm run lint`       | ESLint 검사        |
 | `npm run sync-types` | 서버와 타입 동기화 |
 
 ## 핵심 기능
