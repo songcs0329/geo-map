@@ -1,5 +1,3 @@
-"use client";
-
 import useMapStore from "@/stores/useMapStore";
 import { GeoJSONFeature } from "@/types/map";
 import { useEffect, useMemo, useRef } from "react";
