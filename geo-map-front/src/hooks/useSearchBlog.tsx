@@ -1,12 +1,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { searchBlog } from "@/lib/apis/naverSearch";
+import { SearchFormSort } from "./useSearchForm";
 
 const DISPLAY_COUNT = 10;
 const MAX_START = 1000;
 
 interface UseSearchBlogParams {
   keyword: string;
-  sort?: "sim" | "date";
+  sort?: SearchFormSort;
 }
 
 function useSearchBlog({ keyword, sort = "sim" }: UseSearchBlogParams) {

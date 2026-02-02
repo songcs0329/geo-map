@@ -61,8 +61,11 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
   return (
     <FormProvider {...methods}>
       <DrawerHeader className="sticky top-0 z-10">
-        <DrawerTitle>검색 폼</DrawerTitle>
-        <DrawerDescription>검색 키워드, 유사도 선택</DrawerDescription>
+        <DrawerTitle>{address}</DrawerTitle>
+        <DrawerDescription className="sr-only">
+          {address} 지역에 대한 검색 폼
+        </DrawerDescription>
+        <hr />
 
         <form
           className="flex flex-col gap-1.5"
