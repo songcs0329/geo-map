@@ -29,31 +29,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getRegionPrefix } from "@/lib/geoUtils";
 
 type SearchFormHeaderProps = {
-  regionPrefix: string;
+  address: string;
 };
 
 function SearchFormHeader(props: SearchFormHeaderProps) {
-  const { regionPrefix } = props;
+  const { address } = props;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const methods = useSearchForm();
   const { formState, handleSubmit, control } = methods;
 
   const onSubmit = (data: SearchFormData) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const submitParams = new URLSearchParams(searchParams.toString());
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
+    if (data.keyword) {
+      submitParams.set("keyword", `${address} ${data.keyword}`);
+    }
 
-    router.push(`${pathname}?${params.toString()}`);
+    if (data.sort) {
+      submitParams.set("sort", data.sort);
+    }
+
+    router.push(`${pathname}?${submitParams.toString()}`);
   };
 
   return (
@@ -89,7 +91,7 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
                         align="inline-start"
                         className="bg-gray-200 px-3 py-2"
                       >
-                        {regionPrefix}
+                        {getRegionPrefix(address)}
                       </InputGroupAddon>
                       <InputGroupAddon align="inline-end">
                         <SearchIcon className="text-muted-foreground" />
