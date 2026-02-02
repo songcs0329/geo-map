@@ -13,7 +13,7 @@ const SERVER_TYPES_DIR = path.join(__dirname, "../../geo-map-server/src/types");
 const FRONT_SHARED_TYPES_DIR = path.join(__dirname, "../src/types/shared");
 
 // 복사할 타입 파일 목록
-const SHARED_TYPE_FILES = ["geojson.types.ts"];
+const SHARED_TYPE_FILES = ["geojson.types.ts", "naver-search.types.ts"];
 
 function syncTypes() {
   console.log("=== 타입 동기화 시작 ===\n");
