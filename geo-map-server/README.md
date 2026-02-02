@@ -1,98 +1,122 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Geo-Map Server
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+행정구역 기반 지도 시각화 프로젝트의 백엔드 API 서버. GeoJSON 데이터 제공 및 네이버 검색 API 프록시 기능을 담당합니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 기술 스택
 
-## Description
+- **Framework:** NestJS 11
+- **Language:** TypeScript 5
+- **Validation:** class-validator, class-transformer
+- **Config:** @nestjs/config
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 시작하기
 
-## Project setup
+### 환경 변수 설정
 
 ```bash
-$ npm install
+# .env.local
+NAVER_API_BASE_URL=https://openapi.naver.com/v1
+NAVER_SEARCH_CLIENT_ID=your_client_id
+NAVER_SEARCH_CLIENT_SECRET=your_client_secret
 ```
 
-## Compile and run the project
+### 설치 및 실행
 
 ```bash
-# development
-$ npm run start
+# 의존성 설치
+npm install
 
-# watch mode
-$ npm run start:dev
+# 개발 서버 실행 (local 환경)
+npm run start:local
 
-# production mode
-$ npm run start:prod
+# 개발 서버 실행 (development 환경)
+npm run start:dev
 ```
 
-## Run tests
+서버는 [http://localhost:4000](http://localhost:4000)에서 실행됩니다.
 
-```bash
-# unit tests
-$ npm run test
+## 스크립트
 
-# e2e tests
-$ npm run test:e2e
+| 명령어 | 설명 |
+|--------|------|
+| `npm run start:local` | 로컬 개발 서버 (watch mode) |
+| `npm run start:dev` | 개발 서버 (watch mode) |
+| `npm run start:prod` | 프로덕션 서버 |
+| `npm run build` | 빌드 |
+| `npm run lint` | ESLint 검사 |
+| `npm run test` | 단위 테스트 |
+| `npm run test:e2e` | E2E 테스트 |
 
-# test coverage
-$ npm run test:cov
+## API 엔드포인트
+
+### Health Check
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/health` | 서버 상태 확인 |
+
+### GeoJSON
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/geojson?level={level}` | 행정구역 레벨별 GeoJSON 조회 |
+| GET | `/api/geojson/region/:adm_cd` | 특정 행정구역 GeoJSON 조회 |
+
+**Query Parameters:**
+- `level`: `sido` \| `sgg` \| `dong`
+
+### Search (Naver API Proxy)
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/search/blog` | 네이버 블로그 검색 |
+| GET | `/api/search/news` | 네이버 뉴스 검색 |
+
+**Query Parameters:**
+- `query` (required): 검색어
+- `display` (optional): 결과 개수 (1-100, 기본값: 10)
+- `start` (optional): 시작 위치 (1-1000, 기본값: 1)
+- `sort` (optional): 정렬 기준 (`sim` \| `date`, 기본값: `sim`)
+
+## 프로젝트 구조
+
+```
+src/
+├── app.module.ts           # 루트 모듈
+├── main.ts                 # 애플리케이션 엔트리포인트
+│
+├── health/                 # Health Check 모듈
+│   ├── health.module.ts
+│   └── health.controller.ts
+│
+├── geojson/                # GeoJSON 모듈
+│   ├── geojson.module.ts
+│   ├── geojson.controller.ts
+│   ├── geojson.service.ts
+│   └── dto/
+│       └── geojson-query.dto.ts
+│
+├── search/                 # 검색 모듈 (Naver API Proxy)
+│   ├── search.module.ts
+│   ├── search.controller.ts
+│   ├── search.service.ts
+│   └── dto/
+│       └── search-query.dto.ts
+│
+├── types/                  # 타입 정의
+│   ├── geojson.types.ts
+│   └── naver-search.types.ts
+│
+└── data/                   # GeoJSON 데이터 파일
+    ├── sido.json
+    ├── sgg.json
+    └── dong.json
 ```
 
-## Deployment
+## CORS 설정
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+현재 다음 Origin을 허용합니다:
+- `http://localhost:3000`
+- `http://localhost:3001`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+허용 메서드: `GET`
