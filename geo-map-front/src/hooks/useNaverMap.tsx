@@ -1,3 +1,5 @@
+"use client";
+
 import useMapStore from "@/stores/useMapStore";
 import { GeoJSONFeature } from "@/types/map";
 import { useEffect, useMemo, useRef } from "react";
@@ -51,7 +53,10 @@ interface UseNaverMapOptions {
 const NAVER_MAP_CLIENT_ID = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
 
 function useNaverMap<T extends HTMLElement>(options: UseNaverMapOptions = {}) {
-  const { center: defaultCenter = { lat: 37.5665, lng: 126.978 }, zoom: defaultZoom = 14 } = options;
+  const {
+    center: defaultCenter = { lat: 37.5665, lng: 126.978 },
+    zoom: defaultZoom = 14,
+  } = options;
   const mapRef = useRef<T>(null);
   const setMapInstance = useMapStore((state) => state.setMapInstance);
   const searchParams = useSearchParams();
@@ -59,15 +64,16 @@ function useNaverMap<T extends HTMLElement>(options: UseNaverMapOptions = {}) {
   // URL searchParams에서 값이 있으면 사용, 없으면 기본값
   const mapOptions = useMemo(() => {
     const query = Object.fromEntries(searchParams);
-    const center = query.lat && query.lng
-    ? { lat: parseFloat(query.lat), lng: parseFloat(query.lng) }
-    : defaultCenter;
+    const center =
+      query.lat && query.lng
+        ? { lat: parseFloat(query.lat), lng: parseFloat(query.lng) }
+        : defaultCenter;
     const zoom = query.zoom ? parseInt(query.zoom, 10) : defaultZoom;
 
     return {
       center,
-      zoom
-    }
+      zoom,
+    };
   }, [searchParams, defaultCenter, defaultZoom]);
 
   // 초기값을 ref로 캡처 (이후 URL 변경 시 재초기화 방지)
@@ -76,13 +82,17 @@ function useNaverMap<T extends HTMLElement>(options: UseNaverMapOptions = {}) {
   useEffect(() => {
     if (!NAVER_MAP_CLIENT_ID || !mapRef.current) return;
 
-    const { center: initialCenter, zoom: initialZoom } = initialOptionsRef.current;
+    const { center: initialCenter, zoom: initialZoom } =
+      initialOptionsRef.current;
 
     const initializeMap = () => {
       if (!mapRef.current) return;
 
       const instance = new window.naver.maps.Map(mapRef.current, {
-        center: new window.naver.maps.LatLng(initialCenter.lat, initialCenter.lng),
+        center: new window.naver.maps.LatLng(
+          initialCenter.lat,
+          initialCenter.lng
+        ),
         zoom: initialZoom,
         minZoom: 12,
       });
