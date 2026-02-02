@@ -6,10 +6,11 @@ import useSearchNews from "@/hooks/useSearchNews";
 import SearchResultList from "./SearchResultList";
 import BlogItemCard from "./BlogItemCard";
 import NewsItemCard from "./NewsItemCard";
+import { SearchFormSort } from "@/hooks/useSearchForm";
 
 interface SearchTabsProps {
   keyword: string;
-  sort: "sim" | "date";
+  sort: SearchFormSort;
 }
 
 function SearchTabs({ keyword, sort }: SearchTabsProps) {
@@ -18,7 +19,7 @@ function SearchTabs({ keyword, sort }: SearchTabsProps) {
 
   if (!keyword || keyword.length < 2) {
     return (
-      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex h-40 items-center justify-center text-sm">
         검색어를 2자 이상 입력해주세요.
       </div>
     );
