@@ -20,4 +20,9 @@ export class SearchController {
   searchCafe(@Query() query: SearchQueryDto) {
     return this.searchService.searchCafe(query);
   }
+
+  @Get('local')
+  searchLocal(@Query() query: SearchQueryDto) {
+    return this.searchService.searchLocal(query);
+  }
 }

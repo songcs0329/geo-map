@@ -10,9 +10,9 @@ import {
 import { formatPostDate, stripHtmlTags } from "@/lib/utils";
 import type { BlogItem } from "@/types/shared/naver-search.types";
 
-interface BlogItemCardProps {
+type BlogItemCardProps = {
   item: BlogItem;
-}
+};
 
 function BlogItemCard({ item }: BlogItemCardProps) {
   return (

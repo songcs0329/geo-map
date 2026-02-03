@@ -10,9 +10,9 @@ import {
 import { formatPubDate, stripHtmlTags } from "@/lib/utils";
 import type { NewsItem } from "@/types/shared/naver-search.types";
 
-interface NewsItemCardProps {
+type NewsItemCardProps = {
   item: NewsItem;
-}
+};
 
 function NewsItemCard({ item }: NewsItemCardProps) {
   const linkUrl = item.originallink || item.link;

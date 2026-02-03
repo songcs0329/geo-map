@@ -1,13 +1,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getSearchNews } from "@/lib/apis/search";
 import { DISPLAY_COUNT, MAX_START } from "@/lib/constants";
-import { SearchFormData } from "./useSearchForm";
+import { UseGetSearchFormOptions } from "./useSearchForm";
 
-interface UseGetSearchNewsOptions extends SearchFormData {
-  enabled?: boolean;
-}
-
-function useGetSearchNews({ keyword, sort = "sim", enabled = true }: UseGetSearchNewsOptions) {
+function useGetSearchNews({
+  keyword,
+  sort = "sim",
+  enabled = true,
+}: UseGetSearchFormOptions) {
   const {
     data,
     error,

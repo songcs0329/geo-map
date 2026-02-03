@@ -4,6 +4,7 @@ import type {
   NewsItem,
   CafeItem,
   SearchParams,
+  LocalItem,
 } from "@/types/shared/naver-search.types";
 import restClient from "./restClient";
 
@@ -26,6 +27,14 @@ export const getSearchNews = async (params: SearchParams) => {
 export const getSearchCafe = async (params: SearchParams) => {
   const res = await restClient.get<NaverSearchResponse<CafeItem>>(
     "/search/cafearticle",
+    params
+  );
+  return res.data;
+}
+
+export const getSearchLocal = async (params: SearchParams) => {
+  const res = await restClient.get<NaverSearchResponse<LocalItem>>(
+    "/search/local",
     params
   );
   return res.data;

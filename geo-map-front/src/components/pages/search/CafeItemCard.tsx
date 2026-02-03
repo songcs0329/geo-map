@@ -10,9 +10,9 @@ import {
 import { stripHtmlTags } from "@/lib/utils";
 import type { CafeItem } from "@/types/shared/naver-search.types";
 
-interface CafeItemCardProps {
+type CafeItemCardProps = {
   item: CafeItem;
-}
+};
 
 function CafeItemCard({ item }: CafeItemCardProps) {
   return (

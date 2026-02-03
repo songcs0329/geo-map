@@ -1,9 +1,9 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getSearchBlog } from "@/lib/apis/search";
+import { getSearchLocal } from "@/lib/apis/search";
 import { DISPLAY_COUNT, MAX_START } from "@/lib/constants";
 import { UseGetSearchFormOptions } from "./useSearchForm";
 
-function useGetSearchBlog({
+function useGetSearchLocal({
   keyword,
   sort = "sim",
   enabled = true,
@@ -16,9 +16,9 @@ function useGetSearchBlog({
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["search", "blog", keyword, sort],
+    queryKey: ["search", "local", keyword, sort],
     queryFn: ({ pageParam = 1 }) =>
-      getSearchBlog({
+      getSearchLocal({
         query: keyword,
         display: DISPLAY_COUNT,
         start: pageParam,
@@ -49,4 +49,4 @@ function useGetSearchBlog({
   };
 }
 
-export default useGetSearchBlog;
+export default useGetSearchLocal;
