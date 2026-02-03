@@ -107,7 +107,7 @@ function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
       className="w-full"
       onValueChange={(value) => setActiveTab(value as TabValue)}
     >
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="sticky top-0 z-10 grid w-full grid-cols-4 shadow-sm">
         {TAB_CONFIG.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}

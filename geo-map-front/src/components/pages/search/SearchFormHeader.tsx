@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/input-group";
 import useSearchForm, { SearchFormData } from "@/hooks/search/useSearchForm";
 import { Controller, FormProvider } from "react-hook-form";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, Share2Icon } from "lucide-react";
+import { copyCurrentPageUrl } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -70,9 +71,20 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
   return (
     <FormProvider {...methods}>
       <DrawerHeader className="sticky top-0 z-10">
-        <DrawerTitle>{address}</DrawerTitle>
+        <div className="flex items-center justify-between">
+          <DrawerTitle>{address}</DrawerTitle>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={copyCurrentPageUrl}
+            aria-label="공유하기"
+          >
+            <Share2Icon className="h-4 w-4" />
+          </Button>
+        </div>
         <DrawerDescription className="sr-only">
-          {address} 지역에 대한 검색 폼
+          {address} 지역 검색
         </DrawerDescription>
         <hr />
 

@@ -1,14 +1,16 @@
 "use client";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { stripHtmlTags } from "@/lib/utils";
 import type { LocalItem } from "@/types/shared/naver-search.types";
+import { Fragment } from "react";
 
 type LocalItemCardProps = {
   item: LocalItem;
@@ -22,9 +24,18 @@ function LocalItemCard({ item }: LocalItemCardProps) {
           <CardTitle className="line-clamp-2 text-sm font-medium">
             {stripHtmlTags(item.title)}
           </CardTitle>
-          <CardDescription className="text-xs">
-            {item.category}
-          </CardDescription>
+          <Breadcrumb>
+            <BreadcrumbList className="text-xs sm:gap-1">
+              {item.category.split(">").map((part, index, arr) => (
+                <Fragment key={index}>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{part}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                  {index < arr.length - 1 && <BreadcrumbSeparator />}
+                </Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
         </CardHeader>
         <CardContent className="space-y-1">
           <p className="text-muted-foreground text-xs">
