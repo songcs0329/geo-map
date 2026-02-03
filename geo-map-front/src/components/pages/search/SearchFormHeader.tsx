@@ -31,6 +31,11 @@ import {
 } from "@/components/ui/select";
 import { getRegionPrefix } from "@/lib/geoUtils";
 
+const SORT_OPTIONS = [
+  { value: "sim", label: "정확도순" },
+  { value: "date", label: "날짜순" },
+] as const;
+
 type SearchFormHeaderProps = {
   address: string;
 };
@@ -119,23 +124,17 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
                 name="sort"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => {
-                      if (value === "none") {
-                        field.onChange("");
-                      } else {
-                        field.onChange(value);
-                      }
-                    }}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id="search-form-sort">
                       <SelectValue placeholder="선택" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="sim">정확도순</SelectItem>
-                        <SelectItem value="date">날짜순</SelectItem>
+                        {SORT_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
