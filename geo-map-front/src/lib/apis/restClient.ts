@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+axios.defaults.baseURL = `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api`
 
 const essentialDataResponse = async <T>(promiseResponse: Promise<AxiosResponse<T, any>>) => {
   const response = await promiseResponse
