@@ -5,8 +5,31 @@ import PolygonMap from "@/components/layout/PolygonMap";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Geo Map",
-  description: "지역 검색 지도 서비스",
+  title: {
+    default: "Geo Map - 행정구역 기반 지도 시각화",
+    template: "%s | Geo Map",
+  },
+  description:
+    "네이버 지도 위에 시/도, 시군구, 동 단위의 행정구역을 시각화하고 지역별 뉴스, 블로그, 카페, 장소 정보를 검색할 수 있는 서비스입니다.",
+  keywords: [
+    "행정구역",
+    "지도",
+    "GeoJSON",
+    "네이버 지도",
+    "지역 검색",
+    "시도",
+    "시군구",
+    "동",
+    "폴리곤",
+  ],
+  authors: [{ name: "Geo Map Team" }],
+  openGraph: {
+    title: "Geo Map - 행정구역 기반 지도 시각화",
+    description:
+      "네이버 지도 위에 시/도, 시군구, 동 단위의 행정구역을 시각화하고 지역별 정보를 검색하세요.",
+    type: "website",
+    locale: "ko_KR",
+  },
 };
 
 export default function RootLayout({
@@ -15,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>
         <QueryProvider>
           <div className="relative h-screen w-full">
