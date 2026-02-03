@@ -8,7 +8,8 @@ import { SearchModule } from './search/search.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      envFilePath: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : undefined,
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
     HealthModule,
     GeoJSONModule,
