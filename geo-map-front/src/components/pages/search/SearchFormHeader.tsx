@@ -18,7 +18,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import useSearchForm, { SearchFormData } from "@/hooks/useSearchForm";
+import useSearchForm, { SearchFormData } from "@/hooks/search/useSearchForm";
 import { Controller, FormProvider } from "react-hook-form";
 import { SearchIcon } from "lucide-react";
 import {
@@ -48,11 +48,15 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
     const submitParams = new URLSearchParams(searchParams.toString());
 
     if (data.keyword) {
-      submitParams.set("keyword", `${address} ${data.keyword}`);
+      submitParams.set("keyword", data.keyword);
+    } else {
+      submitParams.delete("keyword");
     }
 
     if (data.sort) {
       submitParams.set("sort", data.sort);
+    } else {
+      submitParams.delete("sort");
     }
 
     router.push(`${pathname}?${submitParams.toString()}`);

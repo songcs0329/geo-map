@@ -2,11 +2,12 @@ import type {
   NaverSearchResponse,
   BlogItem,
   NewsItem,
+  CafeItem,
   SearchParams,
 } from "@/types/shared/naver-search.types";
 import restClient from "./restClient";
 
-export const searchBlog = async (params: SearchParams) => {
+export const getSearchBlog = async (params: SearchParams) => {
   const res = await restClient.get<NaverSearchResponse<BlogItem>>(
     "/search/blog",
     params
@@ -14,10 +15,18 @@ export const searchBlog = async (params: SearchParams) => {
   return res.data;
 };
 
-export const searchNews = async (params: SearchParams) => {
+export const getSearchNews = async (params: SearchParams) => {
   const res = await restClient.get<NaverSearchResponse<NewsItem>>(
     "/search/news",
     params
   );
   return res.data;
 };
+
+export const getSearchCafe = async (params: SearchParams) => {
+  const res = await restClient.get<NaverSearchResponse<CafeItem>>(
+    "/search/cafearticle",
+    params
+  );
+  return res.data;
+}

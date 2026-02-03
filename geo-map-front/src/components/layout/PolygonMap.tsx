@@ -2,10 +2,10 @@
 
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import useMapPolygon from "@/hooks/useMapPolygon";
-import useNaverMap, { calculateCentroid } from "@/hooks/useNaverMap";
-import useMapBounds from "@/hooks/useMapBounds";
-import useAdminGeoJSON from "@/hooks/useGetGeoJSON";
+import useMapPolygon from "@/hooks/map/useMapPolygon";
+import useNaverMap, { calculateCentroid } from "@/hooks/map/useNaverMap";
+import useMapBounds from "@/hooks/map/useMapBounds";
+import useAdminGeoJSON from "@/hooks/map/useGetGeoJSON";
 import { MAP_CONFIG, ZOOM_LEVELS } from "@/lib/constants";
 import type { GeoJSONFeature } from "@/types/shared/geojson.types";
 import useMapStore from "@/stores/useMapStore";

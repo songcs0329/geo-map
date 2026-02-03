@@ -1,35 +1,37 @@
 "use client";
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import useSearchBlog from "@/hooks/useSearchBlog";
-import useSearchNews from "@/hooks/useSearchNews";
+import useGetSearchBlog from "@/hooks/search/useGetSearchBlog";
+import useGetSearchNews from "@/hooks/search/useGetSearchNews";
+import useGetSearchCafe from "@/hooks/search/useGetSearchCafe";
 import SearchResultList from "./SearchResultList";
 import BlogItemCard from "./BlogItemCard";
 import NewsItemCard from "./NewsItemCard";
-import { SearchFormSort } from "@/hooks/useSearchForm";
+import CafeItemCard from "./CafeItemCard";
+import { SearchFormSort } from "@/hooks/search/useSearchForm";
+
+type TabValue = "blog" | "news" | "cafearticle";
 
 interface SearchTabsProps {
   keyword: string;
   sort: SearchFormSort;
+  address: string;
 }
 
-function SearchTabs({ keyword, sort }: SearchTabsProps) {
-  const blogSearch = useSearchBlog({ keyword, sort });
-  const newsSearch = useSearchNews({ keyword, sort });
-
-  if (!keyword || keyword.length < 2) {
-    return (
-      <div className="text-muted-foreground flex h-40 items-center justify-center text-sm">
-        검색어를 2자 이상 입력해주세요.
-      </div>
-    );
-  }
+function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
+  const [activeTab, setActiveTab] = useState<TabValue>("blog");
+  const query = `${address} ${keyword}`;
+  const blogSearch = useGetSearchBlog({ keyword: query, sort, enabled: activeTab === "blog" });
+  const newsSearch = useGetSearchNews({ keyword: query, sort, enabled: activeTab === "news" });
+  const cafeSearch = useGetSearchCafe({ keyword: query, sort, enabled: activeTab === "cafearticle" });
 
   return (
-    <Tabs defaultValue="blog" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+    <Tabs defaultValue="blog" className="w-full" onValueChange={(value) => setActiveTab(value as TabValue)}>
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="blog">블로그</TabsTrigger>
         <TabsTrigger value="news">뉴스</TabsTrigger>
+        <TabsTrigger value="cafearticle">카페</TabsTrigger>
       </TabsList>
       <TabsContent value="blog" className="mt-4">
         <SearchResultList
@@ -56,6 +58,20 @@ function SearchTabs({ keyword, sort }: SearchTabsProps) {
         >
           {newsSearch.items.map((item, index) => (
             <NewsItemCard key={`${item.link}-${index}`} item={item} />
+          ))}
+        </SearchResultList>
+      </TabsContent>
+      <TabsContent value="cafearticle" className="mt-4">
+        <SearchResultList
+          isLoading={cafeSearch.isLoading}
+          isFetchingNextPage={cafeSearch.isFetchingNextPage}
+          hasNextPage={cafeSearch.hasNextPage ?? false}
+          isEmpty={cafeSearch.items.length === 0}
+          total={cafeSearch.total}
+          fetchNextPage={cafeSearch.fetchNextPage}
+        >
+          {cafeSearch.items.map((item, index) => (
+            <CafeItemCard key={`${item.link}-${index}`} item={item} />
           ))}
         </SearchResultList>
       </TabsContent>

@@ -74,3 +74,6 @@ export const NAVER_MAP_EVENTS = {
   MOUSEOVER: "mouseover",
   MOUSEOUT: "mouseout",
 } as const;
+
+export const DISPLAY_COUNT = 10;
+export const MAX_START = 1000;
