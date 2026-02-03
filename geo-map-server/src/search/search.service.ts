@@ -47,7 +47,9 @@ export class SearchService {
     return this.search<CafeItem>('/search/cafearticle', dto);
   }
 
-  async searchLocal(dto: SearchQueryDto): Promise<NaverSearchResponse<LocalItem>> {
+  async searchLocal(
+    dto: SearchQueryDto,
+  ): Promise<NaverSearchResponse<LocalItem>> {
     return this.search<LocalItem>('/search/local', dto);
   }
 
