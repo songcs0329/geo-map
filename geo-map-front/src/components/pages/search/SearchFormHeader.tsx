@@ -130,7 +130,6 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="none">선택</SelectItem>
                         <SelectItem value="sim">정확도순</SelectItem>
                         <SelectItem value="date">날짜순</SelectItem>
                       </SelectGroup>
