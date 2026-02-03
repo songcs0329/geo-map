@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 export type SearchFormSort = "sim" | "date";
 
 export const searchFormSchema = z.object({
-  keyword: z.string().min(2, "검색어는 최소 2자 이상이어야 합니다."),
+  keyword: z.string(),
   sort: z.enum(["sim", "date"]),
 });
 

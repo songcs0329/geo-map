@@ -7,12 +7,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
@@ -86,16 +81,17 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
         <DrawerDescription className="sr-only">
           {address} 지역 검색
         </DrawerDescription>
+
         <hr />
 
         <form
           className="flex flex-col gap-1.5"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <FieldGroup className="gap-y-4">
-            <Field className="gap-y-1.5">
-              <FieldLabel htmlFor="search-form-keyword">
-                키워드<span className="text-destructive">*</span>
+          <FieldGroup className="gap-y-3">
+            <Field orientation="horizontal" className="gap-0">
+              <FieldLabel htmlFor="search-form-keyword" className="w-20">
+                키워드
               </FieldLabel>
               <Controller
                 name="keyword"
@@ -121,23 +117,20 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
                         <SearchIcon className="text-muted-foreground" />
                       </InputGroupAddon>
                     </InputGroup>
-                    {formState.errors.keyword && (
-                      <FieldError>
-                        {formState.errors.keyword.message}
-                      </FieldError>
-                    )}
                   </>
                 )}
               />
             </Field>
-            <Field className="gap-y-1.5">
-              <FieldLabel htmlFor="search-form-sort">정렬 기준</FieldLabel>
+            <Field orientation="horizontal" className="gap-0">
+              <FieldLabel htmlFor="search-form-sort" className="w-20">
+                정렬 기준
+              </FieldLabel>
               <Controller
                 name="sort"
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="search-form-sort">
+                    <SelectTrigger id="search-form-sort" className="w-full">
                       <SelectValue placeholder="선택" />
                     </SelectTrigger>
                     <SelectContent>
