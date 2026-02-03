@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface SearchResultListProps {
+type SearchResultListProps = {
   children: ReactNode;
   isLoading: boolean;
   isFetchingNextPage: boolean;
@@ -11,7 +11,7 @@ interface SearchResultListProps {
   isEmpty: boolean;
   total: number;
   fetchNextPage: () => void;
-}
+};
 
 function SearchResultList({
   children,

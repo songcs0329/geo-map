@@ -45,9 +45,9 @@ function getQueryClient() {
   return browserQueryClient;
 }
 
-interface QueryProviderProps {
+type QueryProviderProps = {
   children: ReactNode;
-}
+};
 
 export default function QueryProvider({ children }: QueryProviderProps) {
   const queryClient = getQueryClient();
