@@ -1,6 +1,6 @@
 import SearchDrawer from "@/components/pages/search/SearchDrawer";
-import { geoJSONRegionByAdmCdQueryOptions } from "@/hooks/useGetGeoJSONRegionByAdmCd";
-import { SearchFormSort } from "@/hooks/useSearchForm";
+import { geoJSONRegionByAdmCdQueryOptions } from "@/hooks/map/useGetGeoJSONRegionByAdmCd";
+import { SearchFormSort } from "@/hooks/search/useSearchForm";
 import {
   dehydrate,
   HydrationBoundary,

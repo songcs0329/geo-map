@@ -12,6 +12,10 @@ export const searchFormSchema = z.object({
 
 export type SearchFormData = z.infer<typeof searchFormSchema>;
 
+export interface UseGetSearchFormOptions extends SearchFormData {
+  enabled?: boolean;
+}
+
 function useSearchForm() {
   const searchParams = useSearchParams();
 

@@ -18,9 +18,10 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import useSearchForm, { SearchFormData } from "@/hooks/useSearchForm";
+import useSearchForm, { SearchFormData } from "@/hooks/search/useSearchForm";
 import { Controller, FormProvider } from "react-hook-form";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, Share2Icon } from "lucide-react";
+import { copyCurrentPageUrl } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -30,6 +31,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getRegionPrefix } from "@/lib/geoUtils";
+
+const SORT_OPTIONS = [
+  { value: "sim", label: "정확도순" },
+  { value: "date", label: "날짜순" },
+] as const;
 
 type SearchFormHeaderProps = {
   address: string;
@@ -48,11 +54,15 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
     const submitParams = new URLSearchParams(searchParams.toString());
 
     if (data.keyword) {
-      submitParams.set("keyword", `${address} ${data.keyword}`);
+      submitParams.set("keyword", data.keyword);
+    } else {
+      submitParams.delete("keyword");
     }
 
     if (data.sort) {
       submitParams.set("sort", data.sort);
+    } else {
+      submitParams.delete("sort");
     }
 
     router.push(`${pathname}?${submitParams.toString()}`);
@@ -61,9 +71,20 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
   return (
     <FormProvider {...methods}>
       <DrawerHeader className="sticky top-0 z-10">
-        <DrawerTitle>{address}</DrawerTitle>
+        <div className="flex items-center justify-between">
+          <DrawerTitle>{address}</DrawerTitle>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={copyCurrentPageUrl}
+            aria-label="공유하기"
+          >
+            <Share2Icon className="h-4 w-4" />
+          </Button>
+        </div>
         <DrawerDescription className="sr-only">
-          {address} 지역에 대한 검색 폼
+          {address} 지역 검색
         </DrawerDescription>
         <hr />
 
@@ -115,23 +136,17 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
                 name="sort"
                 control={control}
                 render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => {
-                      if (value === "none") {
-                        field.onChange("");
-                      } else {
-                        field.onChange(value);
-                      }
-                    }}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id="search-form-sort">
                       <SelectValue placeholder="선택" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="sim">정확도순</SelectItem>
-                        <SelectItem value="date">날짜순</SelectItem>
+                        {SORT_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

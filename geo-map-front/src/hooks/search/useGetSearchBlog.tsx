@@ -1,16 +1,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { searchNews } from "@/lib/apis/naverSearch";
-import { SearchFormSort } from "./useSearchForm";
+import { getSearchBlog } from "@/lib/apis/search";
+import { DISPLAY_COUNT, MAX_START } from "@/lib/constants";
+import { UseGetSearchFormOptions } from "./useSearchForm";
 
-const DISPLAY_COUNT = 10;
-const MAX_START = 1000;
-
-interface UseSearchNewsParams {
-  keyword: string;
-  sort?: SearchFormSort;
-}
-
-function useSearchNews({ keyword, sort = "sim" }: UseSearchNewsParams) {
+function useGetSearchBlog({
+  keyword,
+  sort = "sim",
+  enabled = true,
+}: UseGetSearchFormOptions) {
   const {
     data,
     error,
@@ -19,9 +16,9 @@ function useSearchNews({ keyword, sort = "sim" }: UseSearchNewsParams) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ["search", "news", keyword, sort],
+    queryKey: ["search", "blog", keyword, sort],
     queryFn: ({ pageParam = 1 }) =>
-      searchNews({
+      getSearchBlog({
         query: keyword,
         display: DISPLAY_COUNT,
         start: pageParam,
@@ -35,7 +32,7 @@ function useSearchNews({ keyword, sort = "sim" }: UseSearchNewsParams) {
       }
       return nextStart;
     },
-    enabled: !!keyword && keyword.length >= 2,
+    enabled: enabled && !!keyword && keyword.length >= 2,
   });
 
   const items = data?.pages.flatMap((page) => page.items) ?? [];
@@ -52,4 +49,4 @@ function useSearchNews({ keyword, sort = "sim" }: UseSearchNewsParams) {
   };
 }
 
-export default useSearchNews;
+export default useGetSearchBlog;

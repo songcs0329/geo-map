@@ -23,9 +23,29 @@ export interface NewsItem {
   pubDate: string; // RFC 822 형식
 }
 
+export interface CafeItem {
+  title: string;
+  link: string;
+  description: string;
+  cafename: string;
+  cafeurl: string;
+}
+
+export interface LocalItem {
+  title: string;
+  link: string;
+  category: string;
+  description: string;
+  telephone: string;
+  address: string;
+  roadAddress: string;
+  mapx: string;
+  mapy: string;
+}
+
 export interface SearchParams {
   query: string;
   display?: number;
   start?: number;
-  sort?: "sim" | "date";
+  sort?: 'sim' | 'date';
 }
