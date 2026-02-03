@@ -15,4 +15,9 @@ export class SearchController {
   searchNews(@Query() query: SearchQueryDto) {
     return this.searchService.searchNews(query);
   }
+
+  @Get('cafearticle')
+  searchCafe(@Query() query: SearchQueryDto) {
+    return this.searchService.searchCafe(query);
+  }
 }
