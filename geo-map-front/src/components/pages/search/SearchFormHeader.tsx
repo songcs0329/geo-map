@@ -78,8 +78,8 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
             <Share2Icon className="h-4 w-4" />
           </Button>
         </div>
-        <DrawerDescription className="sr-only">
-          {address} 지역 검색
+        <DrawerDescription>
+          해당 지역의 뉴스, 장소, 블로그, 카페 정보를 검색합니다.
         </DrawerDescription>
 
         <hr />
