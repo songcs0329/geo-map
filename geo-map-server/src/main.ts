@@ -5,8 +5,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const CORS_ORIGINS = [process.env.CORS_ORIGINS];
+
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: CORS_ORIGINS,
     methods: ['GET'],
   });
 
