@@ -1,7 +1,13 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import QueryProvider from "@/components/layout/QueryProvider";
 import PolygonMap from "@/components/layout/PolygonMap";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Geo Map",
+  description: "지역 검색 지도 서비스",
+};
 
 export default function RootLayout({
   children,
