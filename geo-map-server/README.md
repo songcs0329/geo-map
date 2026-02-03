@@ -71,6 +71,8 @@ npm run start:dev
 |--------|----------|------|
 | GET | `/api/search/blog` | 네이버 블로그 검색 |
 | GET | `/api/search/news` | 네이버 뉴스 검색 |
+| GET | `/api/search/cafearticle` | 네이버 카페 검색 |
+| GET | `/api/search/local` | 네이버 지역(장소) 검색 |
 
 **Query Parameters:**
 - `query` (required): 검색어
