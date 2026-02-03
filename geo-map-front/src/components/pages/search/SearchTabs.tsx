@@ -14,9 +14,9 @@ import CafeItemCard from "./CafeItemCard";
 import LocalItemCard from "./LocalItemCard";
 
 const TAB_CONFIG = [
+  { value: "news", label: "뉴스" },
   { value: "local", label: "지역" },
   { value: "blog", label: "블로그" },
-  { value: "news", label: "뉴스" },
   { value: "cafearticle", label: "카페" },
 ] as const;
 
@@ -29,9 +29,14 @@ type SearchTabsProps = {
 };
 
 function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabValue>("local");
+  const [activeTab, setActiveTab] = useState<TabValue>("news");
   const query = `${address} ${keyword}`;
 
+  const newsSearch = useGetSearchNews({
+    keyword: query,
+    sort,
+    enabled: activeTab === "news",
+  });
   const localSearch = useGetSearchLocal({
     keyword: query,
     sort,
@@ -41,11 +46,6 @@ function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
     keyword: query,
     sort,
     enabled: activeTab === "blog",
-  });
-  const newsSearch = useGetSearchNews({
-    keyword: query,
-    sort,
-    enabled: activeTab === "news",
   });
   const cafeSearch = useGetSearchCafe({
     keyword: query,
@@ -103,7 +103,7 @@ function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
 
   return (
     <Tabs
-      defaultValue="local"
+      defaultValue="news"
       className="w-full"
       onValueChange={(value) => setActiveTab(value as TabValue)}
     >
