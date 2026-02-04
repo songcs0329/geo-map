@@ -6,16 +6,13 @@ import useGetSearchBlog from "@/hooks/search/useGetSearchBlog";
 import useGetSearchNews from "@/hooks/search/useGetSearchNews";
 import useGetSearchCafe from "@/hooks/search/useGetSearchCafe";
 import { SearchFormSort } from "@/hooks/search/useSearchForm";
-import useGetSearchLocal from "@/hooks/search/useGetSearchLocal";
 import SearchResultList from "./SearchResultList";
 import BlogItemCard from "./BlogItemCard";
 import NewsItemCard from "./NewsItemCard";
 import CafeItemCard from "./CafeItemCard";
-import LocalItemCard from "./LocalItemCard";
 
 const TAB_CONFIG = [
   { value: "news", label: "뉴스" },
-  { value: "local", label: "지역" },
   { value: "blog", label: "블로그" },
   { value: "cafearticle", label: "카페" },
 ] as const;
@@ -37,11 +34,6 @@ function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
     sort,
     enabled: activeTab === "news",
   });
-  const localSearch = useGetSearchLocal({
-    keyword: query,
-    sort,
-    enabled: activeTab === "local",
-  });
   const blogSearch = useGetSearchBlog({
     keyword: query,
     sort,
@@ -55,13 +47,6 @@ function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
 
   const renderContent = (tabValue: TabValue) => {
     const configMap = {
-      local: {
-        search: localSearch,
-        renderItems: () =>
-          localSearch.items.map((item, index) => (
-            <LocalItemCard key={`${item.link}-${index}`} item={item} />
-          )),
-      },
       blog: {
         search: blogSearch,
         renderItems: () =>
@@ -107,7 +92,7 @@ function SearchTabs({ keyword, sort, address }: SearchTabsProps) {
       className="w-full"
       onValueChange={(value) => setActiveTab(value as TabValue)}
     >
-      <TabsList className="sticky top-0 z-10 grid w-full grid-cols-4 shadow-sm">
+      <TabsList className="sticky top-0 z-10 grid w-full grid-cols-3 shadow-sm">
         {TAB_CONFIG.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}
