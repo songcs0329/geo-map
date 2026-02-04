@@ -7,25 +7,15 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { FieldGroup } from "@/components/ui/field";
 import useSearchForm, { SearchFormData } from "@/hooks/search/useSearchForm";
-import { Controller, FormProvider } from "react-hook-form";
-import { SearchIcon, Share2Icon } from "lucide-react";
+import { FormProvider } from "react-hook-form";
+import { Search, Share2Icon } from "lucide-react";
 import { copyCurrentPageUrl } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getRegionPrefix } from "@/lib/geoUtils";
+import { InputFormField } from "@/components/forms/InputFormField";
+import { SelectFormField } from "@/components/forms/SelectFormField";
+import { Badge } from "@/components/ui/badge";
 
 const SORT_OPTIONS = [
   { value: "sim", label: "정확도순" },
@@ -43,7 +33,7 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
   const searchParams = useSearchParams();
 
   const methods = useSearchForm();
-  const { formState, handleSubmit, control } = methods;
+  const { handleSubmit, control } = methods;
 
   const onSubmit = (data: SearchFormData) => {
     const submitParams = new URLSearchParams(searchParams.toString());
@@ -89,68 +79,30 @@ function SearchFormHeader(props: SearchFormHeaderProps) {
           onSubmit={handleSubmit(onSubmit)}
         >
           <FieldGroup className="gap-y-3">
-            <Field orientation="horizontal" className="gap-0">
-              <FieldLabel htmlFor="search-form-keyword" className="w-20">
-                키워드
-              </FieldLabel>
-              <Controller
-                name="keyword"
-                control={control}
-                render={({ field }) => (
-                  <>
-                    <InputGroup className="overflow-hidden">
-                      <InputGroupInput
-                        id="search-form-keyword"
-                        placeholder="키워드 입력"
-                        aria-invalid={!!formState.errors.keyword}
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                      />
-                      <InputGroupAddon
-                        align="inline-start"
-                        className="bg-gray-200 px-3 py-2"
-                      >
-                        {getRegionPrefix(address)}
-                      </InputGroupAddon>
-                      <InputGroupAddon align="inline-end">
-                        <SearchIcon className="text-muted-foreground" />
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </>
-                )}
-              />
-            </Field>
-            <Field orientation="horizontal" className="gap-0">
-              <FieldLabel htmlFor="search-form-sort" className="w-20">
-                정렬 기준
-              </FieldLabel>
-              <Controller
-                name="sort"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="search-form-sort" className="w-full">
-                      <SelectValue placeholder="선택" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {SORT_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </Field>
+            <InputFormField
+              control={control}
+              name="keyword"
+              label="키워드"
+              id="search-form-keyword"
+              placeholder="키워드 입력"
+              prefix={
+                <Badge variant="secondary">{getRegionPrefix(address)}</Badge>
+              }
+              suffix={<Search className="text-muted-foreground" />}
+            />
 
-            <Field orientation="horizontal" className="justify-end">
-              <Button type="submit">검색</Button>
-            </Field>
+            <SelectFormField
+              control={control}
+              name="sort"
+              label="정렬 기준"
+              id="search-form-sort"
+              placeholder="선택"
+              options={SORT_OPTIONS}
+            />
           </FieldGroup>
+          <Button type="submit" className="ml-auto justify-end">
+            검색
+          </Button>
         </form>
       </DrawerHeader>
     </FormProvider>
