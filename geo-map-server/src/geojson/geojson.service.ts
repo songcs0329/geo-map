@@ -29,7 +29,9 @@ export class GeoJSONService implements OnModuleInit {
     for (const level of adminLevels) {
       const filePath = join(dataDir, `${level}.json`);
       const fileContent = readFileSync(filePath, 'utf-8');
-      this.geoJSONData[level] = JSON.parse(fileContent);
+      this.geoJSONData[level] = JSON.parse(
+        fileContent,
+      ) as GeoJSONFeatureCollection;
       console.log(
         `Loaded ${level}.json: ${this.geoJSONData[level]?.features.length} features`,
       );
@@ -62,5 +64,32 @@ export class GeoJSONService implements OnModuleInit {
     }
 
     return feature;
+  }
+
+  getRegionSearch(regionName: string, level?: AdminLevel): GeoJSONFeature[] {
+    const results: GeoJSONFeature[] = [];
+    const searchRegionName = regionName.toLowerCase();
+    const levelsToSearch: AdminLevel[] = level
+      ? [level]
+      : ['sido', 'sgg', 'dong'];
+
+    for (const adminLevel of levelsToSearch) {
+      const data = this.geoJSONData[adminLevel];
+      if (!data) continue;
+
+      for (const feature of data.features) {
+        const { adm_nm, sidonm, sggnm } = feature.properties;
+        const searchableText = [adm_nm, sidonm, sggnm]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        if (searchableText.includes(searchRegionName)) {
+          results.push(feature);
+        }
+      }
+    }
+
+    return results;
   }
 }
