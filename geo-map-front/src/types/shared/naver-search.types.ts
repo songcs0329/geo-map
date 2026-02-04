@@ -39,18 +39,6 @@ export interface CafeItem {
   cafeurl: string;
 }
 
-export interface LocalItem {
-  title: string;
-  link: string;
-  category: string;
-  description: string;
-  telephone: string;
-  address: string;
-  roadAddress: string;
-  mapx: string;
-  mapy: string;
-}
-
 export interface SearchParams {
   query: string;
   display?: number;

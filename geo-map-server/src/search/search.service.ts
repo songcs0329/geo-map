@@ -4,7 +4,6 @@ import {
   BlogItem,
   NewsItem,
   CafeItem,
-  LocalItem,
 } from '../types/naver-search.types';
 import { SearchQueryDto } from './dto/search-query.dto';
 import { ConfigService } from '@nestjs/config';
@@ -45,12 +44,6 @@ export class SearchService {
     dto: SearchQueryDto,
   ): Promise<NaverSearchResponse<CafeItem>> {
     return this.search<CafeItem>('/search/cafearticle', dto);
-  }
-
-  async searchLocal(
-    dto: SearchQueryDto,
-  ): Promise<NaverSearchResponse<LocalItem>> {
-    return this.search<LocalItem>('/search/local', dto);
   }
 
   private async search<T>(
