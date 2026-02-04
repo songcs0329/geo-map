@@ -77,3 +77,44 @@ export const NAVER_MAP_EVENTS = {
 
 export const DISPLAY_COUNT = 10;
 export const MAX_START = 1000;
+
+// ========================================
+// Kakao Maps 설정
+// ========================================
+
+/**
+ * 카카오 지도 기본 설정
+ * - level: 낮을수록 확대 (1=최대확대, 14=최대축소)
+ */
+export const KAKAO_MAP_CONFIG = {
+  DEFAULT_CENTER: { lat: 37.5665, lng: 126.978 },
+  DEFAULT_LEVEL: 8,
+  MIN_LEVEL: 1,
+  MAX_LEVEL: 14,
+} as const;
+
+/**
+ * 카카오 지도 레벨별 행정구역 표시 기준
+ * - level은 낮을수록 확대됨 (네이버 zoom과 반대)
+ * - sido: 시/도 레벨 (12~14)
+ * - sgg: 시군구 레벨 (9~11)
+ * - dong: 동 레벨 (1~8)
+ */
+export const KAKAO_ZOOM_LEVELS = {
+  SIDO: { min: 12, max: 14 },
+  SGG: { min: 9, max: 11 },
+  DONG: { min: 1, max: 8 },
+} as const;
+
+/**
+ * Kakao Maps 이벤트명
+ */
+export const KAKAO_MAP_EVENTS = {
+  // Map 이벤트
+  BOUNDS_CHANGED: "bounds_changed",
+  ZOOM_CHANGED: "zoom_changed",
+  // Polygon/Overlay 이벤트
+  CLICK: "click",
+  MOUSEOVER: "mouseover",
+  MOUSEOUT: "mouseout",
+} as const;
