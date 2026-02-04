@@ -10,3 +10,8 @@ export const getGeoJSONRegionByAdmCd = async (adm_cd: string) => {
   const res = await restClient.get<GeoJSONFeature>(`/geojson/region/${adm_cd}`)
   return res.data
 }
+
+export const geGeoJSONResgionSearch = async (regionName: string, level?: AdminLevel) => {
+  const res = await restClient.get<GeoJSONFeature>(`/geojson/search`, { regionName, level })
+  return res.data
+}
