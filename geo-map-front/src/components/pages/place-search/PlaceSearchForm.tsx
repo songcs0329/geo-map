@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Eraser, Search } from "lucide-react";
 import useKakaoPlacesSearchForm from "@/hooks/kakao/useKakaoPlacesSearchForm";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,7 +27,7 @@ import { PLACE_SORT_OPTIONS, CATEGORY_OPTIONS } from "@/lib/constants";
  * - sort: 정렬 방식 (정확도순/거리순)
  */
 function PlaceSearchForm() {
-  const { form, onSubmit } = useKakaoPlacesSearchForm();
+  const { form, onSubmit, onReset } = useKakaoPlacesSearchForm();
   const { register, watch, setValue, formState } = form;
 
   // query 값 감시 (버튼 활성화/비활성화용)
@@ -93,14 +93,25 @@ function PlaceSearchForm() {
         </div>
       </div>
 
-      <Button
-        type="submit"
-        size="icon"
-        disabled={isSubmitDisabled}
-        aria-label="검색"
-      >
-        <Search className="size-4" />
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button
+          type="reset"
+          size="icon"
+          aria-label="초기화"
+          variant="secondary"
+          onClick={onReset}
+        >
+          <Eraser className="size-4" />
+        </Button>
+        <Button
+          type="submit"
+          size="icon"
+          disabled={isSubmitDisabled}
+          aria-label="검색"
+        >
+          <Search className="size-4" />
+        </Button>
+      </div>
     </form>
   );
 }

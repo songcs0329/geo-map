@@ -68,16 +68,16 @@ function useKakaoPlacesSearchForm() {
     },
   });
 
-  // searchParams 변경 시 폼 값 동기화
-  useEffect(() => {
+  // 폼 초기화
+  const onReset = () => {
     form.reset({
-      query: searchValues.query,
-      category_group_code: searchValues.category_group_code,
-      x: searchValues.x,
-      y: searchValues.y,
-      sort: searchValues.sort,
+      query: "",
+      category_group_code: undefined,
+      x: undefined,
+      y: undefined,
+      sort: "accuracy",
     });
-  }, [searchParams]);
+  };
 
   /**
    * 폼 제출 핸들러
@@ -116,8 +116,20 @@ function useKakaoPlacesSearchForm() {
     [router, searchParams]
   );
 
+  // searchParams 변경 시 폼 값 동기화
+  useEffect(() => {
+    form.reset({
+      query: searchValues.query,
+      category_group_code: searchValues.category_group_code,
+      x: searchValues.x,
+      y: searchValues.y,
+      sort: searchValues.sort,
+    });
+  }, [searchParams]);
+
   return {
     form,
+    onReset,
     onSubmit: form.handleSubmit(onSubmit),
     searchValues,
   };
