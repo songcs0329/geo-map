@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Share2 } from "lucide-react";
+import { Info, Share2 } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 import {
   Drawer,
@@ -86,13 +86,29 @@ function PlaceSearchLayout() {
             </Button>
           </div>
 
-          {/* 설명: 줌 레벨 안내 포함 */}
-          <DrawerDescription className="mt-1 text-xs">
-            카카오 장소 검색 API를 사용합니다.
-            <br />
-            <span className="text-muted-foreground/70">
-              현재 줌 레벨: {level} (시군구 영역 클릭 시 검색)
-            </span>
+          {/* 설명: 기능 안내 */}
+          <DrawerDescription asChild>
+            <dl className="text-muted-foreground mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
+              <dt className="flex items-center gap-1 font-medium text-gray-700">
+                <Info size={10} />줌 레벨
+              </dt>
+              <dd>현재 {level} (10~12: 시/도, 7~9: 시군구)</dd>
+              <dt className="flex items-center gap-1 font-medium text-gray-700">
+                <Info size={10} />
+                지도 영역
+              </dt>
+              <dd>드래그로 이동, 스크롤로 확대/축소</dd>
+              <dt className="flex items-center gap-1 font-medium text-gray-700">
+                <Info size={10} />
+                폴리곤 클릭
+              </dt>
+              <dd>시/도 → 확대, 시군구 → 검색 시작</dd>
+              <dt className="flex items-center gap-1 font-medium text-gray-700">
+                <Info size={10} />
+                장소 검색
+              </dt>
+              <dd>키워드 입력 후 현재 지도 중심 기준 검색</dd>
+            </dl>
           </DrawerDescription>
 
           {/* 검색 폼 */}
