@@ -86,7 +86,7 @@ function useKakaoPlacesSearchForm() {
    */
   const onSubmit = useCallback(
     (data: PlaceSearchFormData) => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(searchParams.toString());
 
       // 필수값: query
       if (data.query) {
@@ -113,7 +113,7 @@ function useKakaoPlacesSearchForm() {
 
       router.push(`/?${params.toString()}`);
     },
-    [router]
+    [router, searchParams]
   );
 
   return {
