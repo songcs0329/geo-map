@@ -34,7 +34,7 @@ import PlaceSearchList from "./PlaceSearchList";
  */
 function PlaceSearchLayout() {
   const searchParams = useSearchParams();
-  const { totalCount } = useGetKakaoPlacesSearch();
+  const { places, totalCount } = useGetKakaoPlacesSearch();
 
   // 현재 검색어
   const query = searchParams.get("query");
@@ -65,7 +65,7 @@ function PlaceSearchLayout() {
    * - 검색어가 없으면: "장소 검색"
    */
   const titleText = query
-    ? `${query} 주변 장소${totalCount > 0 ? ` (${totalCount}건)` : ""}`
+    ? `${query} 주변 장소${totalCount > 0 ? ` (${places.length}/${totalCount}건)` : ""}`
     : "장소 검색";
 
   return (
