@@ -28,7 +28,7 @@ export default function PolygonMap() {
     zoom: MAP_CONFIG.DEFAULT_ZOOM,
   });
 
-  // 클릭 핸들러: 동 레벨이면 라우터 이동, 아니면 줌인
+  // 클릭 핸들러: sgg 레벨이면 라우터 이동, sido면 줌인
   const handleClick = useCallback(
     (feature: GeoJSONFeature) => {
       if (!mapInstance) return;
@@ -36,8 +36,11 @@ export default function PolygonMap() {
       const centroid = calculateCentroid(feature);
       const latlng = new window.naver.maps.LatLng(centroid.lat, centroid.lng);
 
-      // 동 레벨일 때만 라우터 이동
-      if (adminLevel === "dong") {
+      if (adminLevel === "sido") {
+        // 시/도 레벨이면 시군구 레벨로 줌인
+        mapInstance.morph(latlng, ZOOM_LEVELS.SGG.min, { duration: 600 });
+      } else {
+        // 시군구 레벨이면 검색 페이지로 이동
         mapInstance.panTo(latlng, { duration: 600 });
         const searchParams = new URLSearchParams({
           lat: centroid.lat.toString(),
@@ -47,11 +50,6 @@ export default function PolygonMap() {
         router.push(
           `/search/${feature.properties.adm_cd}?${searchParams.toString()}`
         );
-      } else {
-        // sido/sgg 레벨이면 다음 레벨로 줌인
-        const nextZoom =
-          adminLevel === "sido" ? ZOOM_LEVELS.SGG.min : ZOOM_LEVELS.DONG.min;
-        mapInstance.morph(latlng, nextZoom, { duration: 600 });
       }
     },
     [mapInstance, router, adminLevel]

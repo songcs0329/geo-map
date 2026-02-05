@@ -10,7 +10,7 @@ import { MAP_CONFIG, NAVER_MAP_EVENTS } from "@/lib/constants";
  * 지도 bounds 상태 인터페이스
  * @property bounds - 현재 지도의 영역 (남서-북동 좌표)
  * @property zoom - 현재 줌 레벨 (0-21)
- * @property adminLevel - 줌 레벨에 따른 행정구역 단위 (sido | sgg | dong)
+ * @property adminLevel - 줌 레벨에 따른 행정구역 단위 (sido | sgg)
  */
 export interface MapBoundsState {
   bounds: naver.maps.LatLngBounds | null;

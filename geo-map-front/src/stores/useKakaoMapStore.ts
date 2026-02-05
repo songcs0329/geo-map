@@ -2,42 +2,38 @@
 
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { getAdminLevelByKakaoLevel } from "@/lib/kakaoGeoUtils";
-import type { AdminLevel } from "@/types/shared/geojson.types";
+import type { GeoJSONFeature } from "@/types/shared/geojson.types";
 
 interface KakaoMapState {
   map: kakao.maps.Map | null;
   level: number;
   bounds: kakao.maps.LatLngBounds | null;
-  selectedFeatureId: string | null;
+  selectedFeature: GeoJSONFeature | null;
 
   setMap: (map: kakao.maps.Map | null) => void;
   setLevel: (level: number) => void;
   setBounds: (bounds: kakao.maps.LatLngBounds | null) => void;
-  setSelectedFeatureId: (id: string | null) => void;
-  toggleSelectedFeatureId: (id: string) => void;
-
-  getAdminLevel: () => AdminLevel;
+  setSelectedFeature: (feature: GeoJSONFeature | null) => void;
+  toggleSelectedFeature: (feature: GeoJSONFeature) => void;
 }
 
 const useKakaoMapStore = create<KakaoMapState>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       map: null,
       level: 12,
       bounds: null,
-      selectedFeatureId: null,
+      selectedFeature: null,
 
       setMap: (map) => set({ map }),
       setLevel: (level) => set({ level }),
       setBounds: (bounds) => set({ bounds }),
-      setSelectedFeatureId: (id) => set({ selectedFeatureId: id }),
-      toggleSelectedFeatureId: (id) =>
-        set((state) => ({
-          selectedFeatureId: state.selectedFeatureId === id ? null : id,
-        })),
-
-      getAdminLevel: () => getAdminLevelByKakaoLevel(get().level),
+      setSelectedFeature: (feature) => set({ selectedFeature: feature }),
+      toggleSelectedFeature: (feature) =>
+        set((state) => {
+          if (!state.selectedFeature) return { selectedFeature: feature };
+          return { selectedFeature: state.selectedFeature.properties.code === feature.properties.code ? null : feature };
+        }),
     }),
     { name: "kakao-map-store" }
   )

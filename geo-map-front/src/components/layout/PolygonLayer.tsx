@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { Polygon } from "react-kakao-maps-sdk";
 import {
   createDistrictStyles,
@@ -15,7 +15,7 @@ interface PolygonLayerProps {
   onSelect: (feature: GeoJSONFeature) => void;
 }
 
-export default function PolygonLayer({
+const PolygonLayer = memo(function PolygonLayer({
   feature,
   adminLevel,
   isSelected,
@@ -56,4 +56,6 @@ export default function PolygonLayer({
       onClick={() => onSelect(feature)}
     />
   );
-}
+});
+
+export default PolygonLayer;

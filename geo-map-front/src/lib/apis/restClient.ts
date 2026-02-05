@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-axios.defaults.baseURL = `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api`
+const api = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api`,
+})
 
 const essentialDataResponse = async <T>(promiseResponse: Promise<AxiosResponse<T, any>>) => {
   const response = await promiseResponse
@@ -9,10 +11,10 @@ const essentialDataResponse = async <T>(promiseResponse: Promise<AxiosResponse<T
 
 const restClient = {
   get: async <T>(url: string, params?: any) => {
-    return essentialDataResponse(axios.get<T>(url, { params }))
+    return essentialDataResponse(api.get<T>(url, { params }))
   },
   post: async <T>(url: string, data?: any, config?: AxiosRequestConfig) => {
-    return essentialDataResponse(axios.post<T>(url, data, config))
+    return essentialDataResponse(api.post<T>(url, data, config))
   },
 }
 

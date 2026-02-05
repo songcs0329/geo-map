@@ -6,7 +6,7 @@
  * 동기화: npm run sync-types
  */
 
-export type AdminLevel = 'sido' | 'sgg' | 'dong';
+export type AdminLevel = 'sido' | 'sgg';
 
 export interface GeoJSONFeatureProperties {
   OBJECTID: number;

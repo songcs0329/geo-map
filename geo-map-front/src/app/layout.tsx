@@ -40,16 +40,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <QueryProvider>
-          <div className="relative h-screen w-full">
-            {/* 배경: 카카오 지도 (모든 페이지에서 공유) */}
-            <Suspense fallback={null}>
-              <KakaoPolygonMap />
-            </Suspense>
-            {/* 페이지 컨텐츠 (지도 위에 오버레이) */}
-            {children}
-          </div>
-        </QueryProvider>
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

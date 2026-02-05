@@ -36,9 +36,9 @@ export function getSggColor(sggCode: string): string {
 /**
  * 행정 레벨에 따라 피처(폴리곤)의 채우기 색상 결정
  * - sido: 시/도별 고정 색상 (SIDO_COLORS)
- * - sgg, dong: 시군구 코드 기반 해시 색상
+ * - sgg: 시군구 코드 기반 해시 색상
  * @param feature - GeoJSON Feature 객체
- * @param adminLevel - 현재 행정 레벨 ("sido" | "sgg" | "dong")
+ * @param adminLevel - 현재 행정 레벨 ("sido" | "sgg")
  * @returns 헥스 색상 코드
  */
 export function getFeatureColor(
@@ -51,7 +51,6 @@ export function getFeatureColor(
     case "sido":
       return SIDO_COLORS[sido] || "#3B82F6";
     case "sgg":
-    case "dong":
     default:
       return getSggColor(sgg);
   }
@@ -60,19 +59,15 @@ export function getFeatureColor(
 /**
  * 현재 줌 레벨에 따라 표시할 행정구역 레벨 결정
  * - zoom 0~9: 시/도 (sido) - 17개
- * - zoom 10~12: 시군구 (sgg) - ~250개
- * - zoom 13+: 동 (dong) - ~3,500개
+ * - zoom 10~21: 시군구 (sgg) - ~250개
  * @param zoom - 현재 지도 줌 레벨
- * @returns "sido" | "sgg" | "dong"
+ * @returns "sido" | "sgg"
  */
 export function getAdminLevelByZoom(zoom: number): AdminLevel {
   if (zoom <= ZOOM_LEVELS.SIDO.max) {
     return "sido";
-  } else if (zoom <= ZOOM_LEVELS.SGG.max) {
-    return "sgg";
-  } else {
-    return "dong";
   }
+  return "sgg";
 }
 
 /**

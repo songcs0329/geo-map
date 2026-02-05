@@ -12,7 +12,6 @@ import { getGeoJSON } from "@/lib/apis/geojson";
  *
  * - sido: 시/도 레벨 (17개)
  * - sgg: 시군구 레벨 (~250개)
- * - dong: 동 레벨 (~3,500개)
  */
 function useAdminGeoJSON(adminLevel: AdminLevel) {
   const { data, isLoading, error } = useQuery<GeoJSONFeatureCollection>({
