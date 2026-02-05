@@ -13,7 +13,7 @@ import usePlaceSearchStore from "@/stores/usePlaceSearchStore";
 import {
   filterFeaturesByBounds,
   getAdminLevelByKakaoLevel,
-} from "@/lib/kakaoGeoUtils";
+} from "@/lib/kakaoMapUtils";
 import PolygonLayer from "./PolygonLayer";
 import PlaceMarker from "../pages/place-search/PlaceMarker";
 import SelectedPlaceOverlay from "../pages/place-search/SelectedPlaceOverlay";

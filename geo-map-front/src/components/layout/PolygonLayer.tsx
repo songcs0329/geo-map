@@ -5,7 +5,7 @@ import { Polygon } from "react-kakao-maps-sdk";
 import {
   createDistrictStyles,
   convertCoordinatesToPaths,
-} from "@/lib/kakaoGeoUtils";
+} from "@/lib/kakaoMapUtils";
 import type { GeoJSONFeature, AdminLevel } from "@/types/shared/geojson.types";
 
 interface PolygonLayerProps {
