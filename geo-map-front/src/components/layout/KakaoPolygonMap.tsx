@@ -1,13 +1,18 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Map } from "react-kakao-maps-sdk";
+import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk";
+import { useShallow } from "zustand/shallow";
 import useKakaoLoader from "@/hooks/useKakaoLoader";
 import useAdminGeoJSON from "@/hooks/map/useGetGeoJSON";
+import { useKakaoPlacesSearch } from "@/hooks/place/useKakaoPlacesSearch";
 import useKakaoMapStore from "@/stores/useKakaoMapStore";
-import { KAKAO_MAP_CONFIG, KAKAO_ZOOM_LEVELS } from "@/lib/constants";
-import { filterFeaturesByBounds } from "@/lib/kakaoGeoUtils";
+import usePlaceSearchStore from "@/stores/usePlaceSearchStore";
+import { KAKAO_MAP_CONFIG } from "@/lib/constants";
+import {
+  filterFeaturesByBounds,
+  getAdminLevelByKakaoLevel,
+} from "@/lib/kakaoGeoUtils";
 import PolygonLayer from "./PolygonLayer";
 import type { GeoJSONFeature } from "@/types/shared/geojson.types";
 
@@ -50,38 +55,43 @@ function calculateCentroid(feature: GeoJSONFeature): {
 
 export default function KakaoPolygonMap() {
   const { loading, error } = useKakaoLoader();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const {
-    map,
-    bounds,
-    selectedFeatureId,
-    setMap,
-    setLevel,
-    setBounds,
-    toggleSelectedFeatureId,
-    getAdminLevel,
-  } = useKakaoMapStore();
+  // 자동 장소 검색 훅 활성화
+  useKakaoPlacesSearch();
 
-  const adminLevel = getAdminLevel();
+  const { level, bounds, selectedFeature } = useKakaoMapStore(
+    useShallow((state) => ({
+      level: state.level,
+      bounds: state.bounds,
+      selectedFeature: state.selectedFeature,
+    }))
+  );
 
-  const initialCenter = useMemo(() => {
-    const lat = searchParams.get("lat");
-    const lng = searchParams.get("lng");
-    if (lat && lng) {
-      return { lat: parseFloat(lat), lng: parseFloat(lng) };
-    }
-    return KAKAO_MAP_CONFIG.DEFAULT_CENTER;
-  }, [searchParams]);
+  const { setMap, setLevel, setBounds, toggleSelectedFeature } =
+    useKakaoMapStore(
+      useShallow((state) => ({
+        setMap: state.setMap,
+        setLevel: state.setLevel,
+        setBounds: state.setBounds,
+        toggleSelectedFeature: state.toggleSelectedFeature,
+      }))
+    );
 
-  const initialLevel = useMemo(() => {
-    const zoom = searchParams.get("zoom");
-    if (zoom) {
-      return Math.max(1, Math.min(14, 21 - parseInt(zoom, 10)));
-    }
-    return KAKAO_MAP_CONFIG.DEFAULT_LEVEL;
-  }, [searchParams]);
+  const { places, selectedPlace, setSelectedPlace } = usePlaceSearchStore(
+    useShallow((state) => ({
+      places: state.places,
+      selectedPlace: state.selectedPlace,
+      setSelectedPlace: state.setSelectedPlace,
+    }))
+  );
+
+  const adminLevel = useMemo(() => getAdminLevelByKakaoLevel(level), [level]);
+
+  const isSelected = (feature: GeoJSONFeature) => {
+    if (!selectedFeature) return false;
+    if (adminLevel === "sido") return false;
+    return selectedFeature.properties.adm_cd === feature.properties.adm_cd;
+  };
 
   const { data: geoJSON } = useAdminGeoJSON(adminLevel);
 
@@ -92,44 +102,36 @@ export default function KakaoPolygonMap() {
 
   const handlePolygonClick = useCallback(
     (feature: GeoJSONFeature) => {
+      const { map, level } = useKakaoMapStore.getState();
       if (!map) return;
+
+      const currentZoomLevel = map.getLevel();
+      const currentAdminLevel = getAdminLevelByKakaoLevel(level);
       const centroid = calculateCentroid(feature);
       const latlng = new window.kakao.maps.LatLng(centroid.lat, centroid.lng);
 
-      toggleSelectedFeatureId(feature.properties.adm_cd);
-
-      if (adminLevel === "dong") {
-        map.panTo(latlng);
-        const currentLevel = map.getLevel();
-        const approximateZoom = 21 - currentLevel;
-        const params = new URLSearchParams({
-          lat: centroid.lat.toString(),
-          lng: centroid.lng.toString(),
-          zoom: approximateZoom.toString(),
-        });
-        router.push(
-          `/search/${feature.properties.adm_cd}?${params.toString()}`
-        );
-      } else {
-        const nextLevel =
-          adminLevel === "sido"
-            ? KAKAO_ZOOM_LEVELS.SGG.max
-            : KAKAO_ZOOM_LEVELS.DONG.max;
-        map.panTo(latlng);
-        map.setLevel(nextLevel);
+      if (currentAdminLevel === "sgg") {
+        toggleSelectedFeature(feature);
       }
+      map.setLevel(currentZoomLevel - 1);
+      map.panTo(latlng);
     },
-    [map, adminLevel, router, toggleSelectedFeatureId]
+    [toggleSelectedFeature]
   );
 
   if (loading || error) return null;
 
   return (
     <Map
-      center={initialCenter}
-      level={initialLevel}
+      center={KAKAO_MAP_CONFIG.DEFAULT_CENTER}
+      level={KAKAO_MAP_CONFIG.DEFAULT_LEVEL}
       style={{ width: "100%", height: "100vh" }}
-      onCreate={setMap}
+      onCreate={(mapInstance) => {
+        const { map } = useKakaoMapStore.getState();
+        if (map) return;
+        setMap(mapInstance);
+        setBounds(mapInstance.getBounds());
+      }}
       onZoomChanged={(map) => {
         setLevel(map.getLevel());
         setBounds(map.getBounds());
@@ -143,10 +145,48 @@ export default function KakaoPolygonMap() {
           key={feature.properties.adm_cd}
           feature={feature}
           adminLevel={adminLevel}
-          isSelected={selectedFeatureId === feature.properties.adm_cd}
+          isSelected={isSelected(feature)}
           onSelect={handlePolygonClick}
         />
       ))}
+
+      {/* 장소 검색 결과 마커 */}
+      {places.map((place) => (
+        <MapMarker
+          key={place.id}
+          position={{ lat: Number(place.y), lng: Number(place.x) }}
+          onClick={() => setSelectedPlace(place)}
+        />
+      ))}
+
+      {/* 선택된 장소 정보 오버레이 */}
+      {selectedPlace && (
+        <CustomOverlayMap
+          position={{
+            lat: Number(selectedPlace.y),
+            lng: Number(selectedPlace.x),
+          }}
+          yAnchor={1.4}
+        >
+          <div className="bg-white px-3 py-2 rounded-lg shadow-lg border border-gray-200 max-w-50">
+            <p className="font-medium text-sm truncate">
+              {selectedPlace.place_name}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {selectedPlace.address_name}
+            </p>
+            {selectedPlace.phone && (
+              <p className="text-xs text-gray-400">{selectedPlace.phone}</p>
+            )}
+            <button
+              onClick={() => setSelectedPlace(null)}
+              className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-gray-600"
+            >
+              ✕
+            </button>
+          </div>
+        </CustomOverlayMap>
+      )}
     </Map>
   );
 }

@@ -9,13 +9,11 @@ export const MAP_CONFIG = {
 /**
  * 줌 레벨별 행정구역 표시 기준
  * - sido: 시/도 레벨 (0~9)
- * - sgg: 시군구 레벨 (10~12)
- * - dong: 동 레벨 (13~21)
+ * - sgg: 시군구 레벨 (10~21)
  */
 export const ZOOM_LEVELS = {
   SIDO: { min: 0, max: 9 },
-  SGG: { min: 10, max: 12 },
-  DONG: { min: 13, max: 21 },
+  SGG: { min: 10, max: 21 },
 } as const;
 
 /**
@@ -25,7 +23,7 @@ export const POLYGON_STYLES = {
   DEFAULT_FILL_OPACITY: 0.4,
   SELECTED_FILL_OPACITY: 0.7,
   STROKE_COLOR: "#FFFFFF",
-  STROKE_WEIGHT: 2,
+  STROKE_WEIGHT: 1,
 } as const;
 
 /**
@@ -88,22 +86,20 @@ export const MAX_START = 1000;
  */
 export const KAKAO_MAP_CONFIG = {
   DEFAULT_CENTER: { lat: 37.5665, lng: 126.978 },
-  DEFAULT_LEVEL: 8,
-  MIN_LEVEL: 1,
-  MAX_LEVEL: 14,
+  DEFAULT_LEVEL: 12,
+  MIN_LEVEL: 7,
+  MAX_LEVEL: 12,
 } as const;
 
 /**
  * 카카오 지도 레벨별 행정구역 표시 기준
  * - level은 낮을수록 확대됨 (네이버 zoom과 반대)
- * - sido: 시/도 레벨 (12~14)
- * - sgg: 시군구 레벨 (9~11)
- * - dong: 동 레벨 (1~8)
+ * - sido: 시/도 레벨 (10~14)
+ * - sgg: 시군구 레벨 (1~9)
  */
 export const KAKAO_ZOOM_LEVELS = {
-  SIDO: { min: 12, max: 14 },
-  SGG: { min: 9, max: 11 },
-  DONG: { min: 1, max: 8 },
+  SIDO: { min: 10, max: 12 },
+  SGG: { min: 7, max: 9 },
 } as const;
 
 /**
@@ -118,3 +114,17 @@ export const KAKAO_MAP_EVENTS = {
   MOUSEOVER: "mouseover",
   MOUSEOUT: "mouseout",
 } as const;
+
+// ========================================
+// 카카오 Places API 설정
+// ========================================
+
+/**
+ * 장소 검색 정렬 옵션
+ */
+export const PLACE_SORT_OPTIONS = [
+  { value: "accuracy", label: "정확도순" },
+  { value: "distance", label: "거리순" },
+] as const;
+
+export const DEFAULT_PAGE_SIZE = 15;

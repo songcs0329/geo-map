@@ -36,9 +36,9 @@ export function getSggColor(sggCode: string): string {
 /**
  * 행정 레벨에 따라 피처(폴리곤)의 채우기 색상 결정
  * - sido: 시/도별 고정 색상 (SIDO_COLORS)
- * - sgg, dong: 시군구 코드 기반 해시 색상
+ * - sgg: 시군구 코드 기반 해시 색상
  * @param feature - GeoJSON Feature 객체
- * @param adminLevel - 현재 행정 레벨 ("sido" | "sgg" | "dong")
+ * @param adminLevel - 현재 행정 레벨 ("sido" | "sgg")
  * @returns 헥스 색상 코드
  */
 export function getFeatureColor(
@@ -51,7 +51,6 @@ export function getFeatureColor(
     case "sido":
       return SIDO_COLORS[sido] || "#3B82F6";
     case "sgg":
-    case "dong":
     default:
       return getSggColor(sgg);
   }
@@ -60,20 +59,16 @@ export function getFeatureColor(
 /**
  * 현재 카카오 지도 레벨에 따라 표시할 행정구역 레벨 결정
  * - 카카오 level: 낮을수록 확대 (1=최대확대, 14=최대축소)
- * - level 12~14: 시/도 (sido)
- * - level 9~11: 시군구 (sgg)
- * - level 1~8: 동 (dong)
+ * - level 10~14: 시/도 (sido)
+ * - level 1~9: 시군구 (sgg)
  * @param level - 현재 카카오 지도 레벨
- * @returns "sido" | "sgg" | "dong"
+ * @returns "sido" | "sgg"
  */
 export function getAdminLevelByKakaoLevel(level: number): AdminLevel {
   if (level >= KAKAO_ZOOM_LEVELS.SIDO.min) {
     return "sido";
-  } else if (level >= KAKAO_ZOOM_LEVELS.SGG.min) {
-    return "sgg";
-  } else {
-    return "dong";
   }
+  return "sgg";
 }
 
 /**
@@ -306,4 +301,61 @@ export function applyStyle(
 export function getRegionPrefix(address: string): string {
   const parts = address.split(" ");
   return parts[parts.length - 1];
+}
+
+/**
+ * Feature 바운딩 박스의 중심 좌표 계산
+ * @param feature - GeoJSON Feature 객체
+ * @returns 중심점의 위도/경도
+ */
+export function getFeatureCenter(feature: GeoJSONFeature): { lat: number; lng: number } {
+  const bounds = getFeatureBounds(feature);
+  return {
+    lat: (bounds.minLat + bounds.maxLat) / 2,
+    lng: (bounds.minLng + bounds.maxLng) / 2,
+  };
+}
+
+/**
+ * Haversine 공식으로 두 좌표 간 거리 계산
+ * @param lat1 - 시작점 위도
+ * @param lng1 - 시작점 경도
+ * @param lat2 - 끝점 위도
+ * @param lng2 - 끝점 경도
+ * @returns 거리 (미터)
+ */
+export function calculateDistance(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371000; // 지구 반지름 (미터)
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Feature 바운딩 박스에서 검색 반경 계산
+ * - 중심에서 모서리까지의 거리를 반경으로 사용
+ * @param feature - GeoJSON Feature 객체
+ * @returns 반경 (미터, 반올림)
+ */
+export function getFeatureRadius(feature: GeoJSONFeature): number {
+  const bounds = getFeatureBounds(feature);
+  const center = getFeatureCenter(feature);
+  const radius = calculateDistance(
+    center.lat,
+    center.lng,
+    bounds.maxLat,
+    bounds.maxLng
+  );
+  return Math.round(radius);
 }
