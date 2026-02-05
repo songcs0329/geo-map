@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { HealthModule } from './health/health.module';
 import { GeoJSONModule } from './geojson/geojson.module';
-import { SearchModule } from './search/search.module';
 
 @Module({
   controllers: [AppController],
@@ -17,7 +16,6 @@ import { SearchModule } from './search/search.module';
     }),
     HealthModule,
     GeoJSONModule,
-    SearchModule,
   ],
 })
 export class AppModule {}

@@ -1,36 +1,37 @@
 # Geo-Map Server
 
-행정구역 기반 지도 시각화 프로젝트의 백엔드 API 서버. GeoJSON 데이터 제공 및 네이버 검색 API 프록시 기능을 담당합니다.
+행정구역 기반 지도 시각화 프로젝트의 백엔드 API 서버. GeoJSON 데이터를 제공합니다.
 
 ## 기술 스택
 
-- **Framework:** NestJS 11
-- **Language:** TypeScript 5
-- **Validation:** class-validator, class-transformer
-- **Config:** @nestjs/config
+| 구분 | 기술 |
+|------|------|
+| **Framework** | NestJS 11 |
+| **Language** | TypeScript 5 |
+| **Validation** | class-validator, class-transformer |
+| **Config** | @nestjs/config |
+| **Compression** | gzip (compression) |
 
 ## 시작하기
 
 ### 환경 변수 설정
 
 ```bash
+cp .env.example .env.local
+```
+
+```bash
 # .env.local
-NAVER_API_BASE_URL=https://openapi.naver.com/v1
-NAVER_SEARCH_CLIENT_ID=your_client_id
-NAVER_SEARCH_CLIENT_SECRET=your_client_secret
+NODE_ENV=local
+PORT=4000
+CORS_ORIGINS=http://localhost:3000
 ```
 
 ### 설치 및 실행
 
 ```bash
-# 의존성 설치
 npm install
-
-# 개발 서버 실행 (local 환경)
 npm run start:local
-
-# 개발 서버 실행 (development 환경)
-npm run start:dev
 ```
 
 서버는 [http://localhost:4000](http://localhost:4000)에서 실행됩니다.
@@ -49,6 +50,12 @@ npm run start:dev
 
 ## API 엔드포인트
 
+### Root
+
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/` | Hello World |
+
 ### Health Check
 
 | Method | Endpoint | 설명 |
@@ -60,31 +67,39 @@ npm run start:dev
 | Method | Endpoint | 설명 |
 |--------|----------|------|
 | GET | `/api/geojson?level={level}` | 행정구역 레벨별 GeoJSON 조회 |
-| GET | `/api/geojson/region/:adm_cd` | 특정 행정구역 GeoJSON 조회 |
 
 **Query Parameters:**
-- `level`: `sido` \| `sgg` \| `dong`
+- `level`: `sido` | `sgg` | `dong`
 
-### Search (Naver API Proxy)
-
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| GET | `/api/search/blog` | 네이버 블로그 검색 |
-| GET | `/api/search/news` | 네이버 뉴스 검색 |
-| GET | `/api/search/cafearticle` | 네이버 카페 검색 |
-
-**Query Parameters:**
-- `query` (required): 검색어
-- `display` (optional): 결과 개수 (1-100, 기본값: 10)
-- `start` (optional): 시작 위치 (1-1000, 기본값: 1)
-- `sort` (optional): 정렬 기준 (`sim` \| `date`, 기본값: `sim`)
+**Response:**
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "adm_cd": "11",
+        "adm_nm": "서울특별시",
+        "sido": "11",
+        "sidonm": "서울특별시"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[...], ...]]
+      }
+    }
+  ]
+}
+```
 
 ## 프로젝트 구조
 
 ```
 src/
-├── app.module.ts           # 루트 모듈
 ├── main.ts                 # 애플리케이션 엔트리포인트
+├── app.module.ts           # 루트 모듈
+├── app.controller.ts       # 루트 컨트롤러
 │
 ├── health/                 # Health Check 모듈
 │   ├── health.module.ts
@@ -97,27 +112,25 @@ src/
 │   └── dto/
 │       └── geojson-query.dto.ts
 │
-├── search/                 # 검색 모듈 (Naver API Proxy)
-│   ├── search.module.ts
-│   ├── search.controller.ts
-│   ├── search.service.ts
-│   └── dto/
-│       └── search-query.dto.ts
-│
-├── types/                  # 타입 정의
-│   ├── geojson.types.ts
-│   └── naver-search.types.ts
+├── types/
+│   └── geojson.types.ts    # 공유 타입 정의
 │
 └── data/                   # GeoJSON 데이터 파일
-    ├── sido.json
-    ├── sgg.json
-    └── dong.json
+    ├── sido.json           # 시/도 (17개, ~2.7MB)
+    ├── sgg.json            # 시군구 (250개, ~4.0MB)
+    └── dong.json           # 동 (3,500개, ~6.8MB)
 ```
 
 ## CORS 설정
 
-현재 다음 Origin을 허용합니다:
-- `http://localhost:3000`
-- `http://localhost:3001`
+환경변수 `CORS_ORIGINS`에서 허용할 Origin을 설정합니다.
+
+```bash
+CORS_ORIGINS=http://localhost:3000,https://geo-map-front.vercel.app
+```
 
 허용 메서드: `GET`
+
+## 데이터 출처
+
+- [raqoon886/Local_HangJeongDong](https://github.com/raqoon886/Local_HangJeongDong)
