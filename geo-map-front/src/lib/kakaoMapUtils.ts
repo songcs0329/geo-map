@@ -4,7 +4,7 @@ import type {
   AdminLevel,
 } from "@/types/shared/geojson.types";
 import type { FeatureBounds, PolygonStyle } from "@/types/kakao-map.types";
-import { POLYGON_STYLES, SGG_PALETTE, SIDO_COLORS, KAKAO_ZOOM_LEVELS } from "./constants";
+import { POLYGON_STYLES, SGG_PALETTE, SIDO_COLORS, KAKAO_ZOOM_LEVELS, CATEGORY_ICONS } from "./constants";
 
 /**
  * 문자열을 숫자 해시값으로 변환
@@ -301,6 +301,34 @@ export function applyStyle(
 export function getRegionPrefix(address: string): string {
   const parts = address.split(" ");
   return parts[parts.length - 1];
+}
+
+/**
+ * 카테고리 코드에 해당하는 SVG 마커 이미지 생성
+ * @param categoryCode - 카카오 카테고리 코드 (예: "CE7", "FD6")
+ * @returns data URL 형식의 SVG 이미지
+ */
+export function createMarkerSvg(categoryCode: string): string {
+  const icon = CATEGORY_ICONS[categoryCode];
+  const color = icon?.color || "#444";
+  const path = icon?.path || "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"; // 기본 원
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="30" viewBox="0 0 24 30">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3"/>
+        </filter>
+      </defs>
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 7.5 12 18 12 18s12-10.5 12-18C24 5.37 18.63 0 12 0z" fill="${color}" filter="url(#shadow)"/>
+      <circle cx="12" cy="10.5" r="8" fill="white"/>
+      <g transform="translate(4, 2.5) scale(0.667)">
+        <path d="${path}" fill="${color}" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill-opacity="0"/>
+      </g>
+    </svg>
+  `.trim();
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
 /**
