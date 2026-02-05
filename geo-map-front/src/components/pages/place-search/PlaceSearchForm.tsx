@@ -11,32 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { PLACE_SORT_OPTIONS } from "@/lib/constants";
-
-/**
- * 카테고리 그룹 옵션
- * - 카카오 Places API에서 지원하는 카테고리 코드
- */
-const CATEGORY_OPTIONS = [
-  { value: "MT1", label: "대형마트" },
-  { value: "CS2", label: "편의점" },
-  { value: "PS3", label: "어린이집/유치원" },
-  { value: "SC4", label: "학교" },
-  { value: "AC5", label: "학원" },
-  { value: "PK6", label: "주차장" },
-  { value: "OL7", label: "주유소/충전소" },
-  { value: "SW8", label: "지하철역" },
-  { value: "BK9", label: "은행" },
-  { value: "CT1", label: "문화시설" },
-  { value: "AG2", label: "중개업소" },
-  { value: "PO3", label: "공공기관" },
-  { value: "AT4", label: "관광명소" },
-  { value: "AD5", label: "숙박" },
-  { value: "FD6", label: "음식점" },
-  { value: "CE7", label: "카페" },
-  { value: "HP8", label: "병원" },
-  { value: "PM9", label: "약국" },
-] as const;
+import { PLACE_SORT_OPTIONS, CATEGORY_OPTIONS } from "@/lib/constants";
 
 /**
  * PlaceSearchForm
@@ -61,7 +36,7 @@ function PlaceSearchForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-row gap-3">
-      <div className="flex flex-1 flex-col gap-2">
+      <div className="flex flex-1 flex-col gap-3">
         {/* 검색어 입력 */}
         <Input
           {...register("query")}
