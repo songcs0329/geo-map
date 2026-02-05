@@ -1,7 +1,6 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { GeoJSONService } from './geojson.service';
 import { GeoJSONQueryDto } from './dto/geojson-query.dto';
-import { GeoJSONSearchDto } from './dto/geojson-search.dto';
 
 @Controller('api/geojson')
 export class GeoJSONController {
@@ -10,20 +9,5 @@ export class GeoJSONController {
   @Get()
   getByAdminLevel(@Query() query: GeoJSONQueryDto) {
     return this.geoJSONService.getByAdminLevel(query.level);
-  }
-
-  @Get('search')
-  getRegionSearch(@Query() query: GeoJSONSearchDto) {
-    const results = this.geoJSONService.getRegionSearch(
-      query.regionName,
-      query.level,
-    );
-
-    return results[0];
-  }
-
-  @Get('region/:adm_cd')
-  getRegionByAdmCd(@Param('adm_cd') admCd: string) {
-    return this.geoJSONService.getRegionByAdmCd(admCd);
   }
 }
