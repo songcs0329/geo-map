@@ -1,7 +1,5 @@
-import { Suspense } from "react";
 import { Metadata } from "next";
 import QueryProvider from "@/components/layout/QueryProvider";
-import KakaoPolygonMap from "@/components/layout/KakaoPolygonMap";
 import "./globals.css";
 
 export const metadata: Metadata = {

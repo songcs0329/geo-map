@@ -35,65 +35,64 @@ function PlaceSearchForm() {
   const isSubmitDisabled = !queryValue || queryValue.trim().length === 0;
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-row gap-3">
-      <div className="flex flex-1 flex-col gap-3">
-        {/* 검색어 입력 */}
-        <Input
-          {...register("query")}
-          placeholder="장소를 검색하세요"
-          aria-invalid={!!formState.errors.query}
-        />
+    <form onSubmit={onSubmit} className="flex flex-col gap-2">
+      {/* 검색어 입력 */}
+      <Input
+        {...register("query")}
+        placeholder="장소를 검색하세요"
+        className="text-sm"
+        aria-invalid={!!formState.errors.query}
+      />
 
-        {/* 폼 에러 메시지 */}
-        {formState.errors.query && (
-          <p className="text-destructive text-sm">
-            {formState.errors.query.message}
-          </p>
-        )}
+      {/* 폼 에러 메시지 */}
+      {formState.errors.query && (
+        <p className="text-destructive text-sm">
+          {formState.errors.query.message}
+        </p>
+      )}
 
-        {/* 카테고리 및 정렬 필터 */}
-        <div className="flex gap-2">
-          {/* 카테고리 선택 */}
-          <Select
-            value={watch("category_group_code") ?? ""}
-            onValueChange={(value) =>
-              setValue("category_group_code", value || undefined)
-            }
-          >
-            <SelectTrigger className="flex-1" size="sm">
-              <SelectValue placeholder="카테고리" />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORY_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* 카테고리 및 정렬 필터 */}
+      <div className="flex gap-2">
+        {/* 카테고리 선택 */}
+        <Select
+          value={watch("category_group_code") ?? ""}
+          onValueChange={(value) =>
+            setValue("category_group_code", value || undefined)
+          }
+        >
+          <SelectTrigger className="flex-1" size="sm">
+            <SelectValue placeholder="카테고리" />
+          </SelectTrigger>
+          <SelectContent>
+            {CATEGORY_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          {/* 정렬 방식 */}
-          <Select
-            value={watch("sort")}
-            onValueChange={(value) =>
-              setValue("sort", value as "accuracy" | "distance")
-            }
-          >
-            <SelectTrigger className="w-28" size="sm">
-              <SelectValue placeholder="정렬" />
-            </SelectTrigger>
-            <SelectContent>
-              {PLACE_SORT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* 정렬 방식 */}
+        <Select
+          value={watch("sort")}
+          onValueChange={(value) =>
+            setValue("sort", value as "accuracy" | "distance")
+          }
+        >
+          <SelectTrigger className="w-28" size="sm">
+            <SelectValue placeholder="정렬" />
+          </SelectTrigger>
+          <SelectContent>
+            {PLACE_SORT_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex justify-end gap-2">
         <Button
           type="reset"
           size="icon"

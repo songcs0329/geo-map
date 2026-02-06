@@ -1,24 +1,22 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Info, Share2, ChevronDown } from "lucide-react";
+import { Info, Share2 } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 import {
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "@/components/ui/drawer";
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+} from "@/components/ui/sidebar";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import useGetKakaoPlacesSearch from "@/hooks/kakao/useGetKakaoPlacesSearch";
 import useKakaoMapStore from "@/stores/useKakaoMapStore";
-import useIsMobile from "@/hooks/useIsMobile";
-import DesktopDrawer from "./DesktopDrawer";
-import MobileDrawer from "./MobileDrawer";
 import PlaceSearchForm from "./PlaceSearchForm";
 import PlaceSearchList from "./PlaceSearchList";
 
@@ -38,23 +36,14 @@ const USAGE_GUIDE = [
 /**
  * PlaceSearchLayout
  *
- * 역할: 장소 검색 페이지 레이아웃 컴포넌트
- * - 항상 열린 Left Drawer (modal=false, 지도와 상호작용 가능)
- * - DrawerHeader: 제목(검색어 + 총 건수), 설명, 공유 버튼, 검색 폼
- * - DrawerContent: 장소 검색 결과 리스트
- *
- * URL 구조:
- * - 폴리곤 클릭 시: /?query={adm_nm}&x={경도}&y={위도}
- * - 폼 onSubmit 시: /?query=...&x=...&y=...&sort=...&category_group_code=...
- *
- * 줌 레벨 안내:
- * - 시/도 레벨(10~12)에서 폴리곤 클릭하면 시군구 레벨로 이동
- * - 시군구 레벨(7~9)에서 폴리곤 클릭하면 해당 지역 검색 시작
+ * 역할: 장소 검색 사이드바 컴포넌트
+ * - SidebarProvider 내부에서 사용
+ * - 데스크톱: 접고 펼 수 있는 사이드바 (Ctrl/Cmd + B)
+ * - 모바일: Sheet로 표시
  */
 function PlaceSearchLayout() {
   const searchParams = useSearchParams();
   const { places, totalCount } = useGetKakaoPlacesSearch();
-  const isMobile = useIsMobile();
 
   // 현재 검색어
   const query = searchParams.get("query");
@@ -68,7 +57,6 @@ function PlaceSearchLayout() {
 
   /**
    * 공유하기 핸들러
-   * - 현재 URL을 클립보드에 복사
    */
   const handleShare = async () => {
     try {
@@ -79,27 +67,21 @@ function PlaceSearchLayout() {
     }
   };
 
-  /**
-   * 제목 텍스트 생성
-   * - 검색어가 있으면: "{검색어} 주변 장소 (N건)"
-   * - 검색어가 없으면: "장소 검색"
-   */
-  const titleText = query
-    ? `${query} 주변 장소${totalCount > 0 ? ` (${places.length}/${totalCount}건)` : ""}`
-    : "장소 검색";
+  return (
+    <Sidebar collapsible="offcanvas">
+      {/* 헤더 영역 */}
+      <SidebarHeader className="border-b p-4">
+        {/* 제목 및 버튼들 */}
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="text-sm font-semibold">{query} 주변 장소 검색</h2>
+            {totalCount > 0 && (
+              <span className="text-muted-foreground text-xs">
+                {places.length}/{totalCount}건
+              </span>
+            )}
+          </div>
 
-  // 마운트 전까지 렌더링 지연 (hydration mismatch 방지)
-  if (isMobile === undefined) return null;
-
-  const DrawerWrapper = isMobile ? MobileDrawer : DesktopDrawer;
-
-  const drawerContent = (
-    <>
-      {/* 헤더 영역: 제목, 설명, 검색 폼 */}
-      <DrawerHeader className="border-border border-b pb-4">
-        {/* 제목 및 공유 버튼 */}
-        <div className="flex items-center justify-between gap-2">
-          <DrawerTitle className="text-base">{titleText}</DrawerTitle>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -110,24 +92,17 @@ function PlaceSearchLayout() {
           </Button>
         </div>
 
-        {/* 설명: 기능 안내 (collapsible) */}
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground mt-2 flex w-full items-center justify-between px-0 text-xs"
-            >
+        {/* 설명: 기능 안내 (accordion) */}
+        <Accordion type="single" collapsible>
+          <AccordionItem value="usage-guide" className="border-none">
+            <AccordionTrigger className="text-muted-foreground py-2 text-xs hover:no-underline">
               <span className="flex items-center gap-1">
                 <Info size={10} />
                 사용 방법 보기
               </span>
-              <ChevronDown className="size-4 transition-transform [[data-state=open]>&]:rotate-180" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <DrawerDescription asChild className="px-2.5">
-              <dl className="text-muted-foreground mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
+            </AccordionTrigger>
+            <AccordionContent>
+              <dl className="text-muted-foreground grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
                 {USAGE_GUIDE.map(({ label, description }) => (
                   <div key={label} className="contents">
                     <dt className="flex items-center gap-1 font-medium text-gray-700">
@@ -142,22 +117,20 @@ function PlaceSearchLayout() {
                   </div>
                 ))}
               </dl>
-            </DrawerDescription>
-          </CollapsibleContent>
-        </Collapsible>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* 검색 폼 */}
-        <div className="mt-2">
-          <PlaceSearchForm />
-        </div>
-      </DrawerHeader>
+        <PlaceSearchForm />
+      </SidebarHeader>
 
       {/* 검색 결과 리스트 */}
-      <PlaceSearchList />
-    </>
+      <SidebarContent>
+        <PlaceSearchList />
+      </SidebarContent>
+    </Sidebar>
   );
-
-  return <DrawerWrapper>{drawerContent}</DrawerWrapper>;
 }
 
 export default PlaceSearchLayout;
