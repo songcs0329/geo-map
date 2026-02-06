@@ -77,6 +77,7 @@ function useKakaoPlacesSearchForm() {
       y: undefined,
       sort: "accuracy",
     });
+    router.push("/");
   };
 
   /**
