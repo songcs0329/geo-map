@@ -1,20 +1,39 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Info, Share2 } from "lucide-react";
+import { Info, Share2, ChevronDown } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 import {
-  Drawer,
-  DrawerContent,
   DrawerHeader,
   DrawerTitle,
   DrawerDescription,
 } from "@/components/ui/drawer";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import useGetKakaoPlacesSearch from "@/hooks/kakao/useGetKakaoPlacesSearch";
 import useKakaoMapStore from "@/stores/useKakaoMapStore";
+import useIsMobile from "@/hooks/useIsMobile";
+import DesktopDrawer from "./DesktopDrawer";
+import MobileDrawer from "./MobileDrawer";
 import PlaceSearchForm from "./PlaceSearchForm";
 import PlaceSearchList from "./PlaceSearchList";
+
+const USAGE_GUIDE = [
+  {
+    label: "줌 레벨",
+    description: (level: number) => `현재 ${level} (10~12: 시/도, 7~9: 시군구)`,
+  },
+  { label: "지도 영역", description: "드래그로 이동, 스크롤로 확대/축소" },
+  { label: "폴리곤 클릭", description: "시/도 → 확대, 시군구 → 검색 시작" },
+  {
+    label: "장소 검색",
+    description: "키워드 입력 후 현재 지도 중심 기준 검색",
+  },
+] as const;
 
 /**
  * PlaceSearchLayout
@@ -35,6 +54,7 @@ import PlaceSearchList from "./PlaceSearchList";
 function PlaceSearchLayout() {
   const searchParams = useSearchParams();
   const { places, totalCount } = useGetKakaoPlacesSearch();
+  const isMobile = useIsMobile();
 
   // 현재 검색어
   const query = searchParams.get("query");
@@ -68,60 +88,76 @@ function PlaceSearchLayout() {
     ? `${query} 주변 장소${totalCount > 0 ? ` (${places.length}/${totalCount}건)` : ""}`
     : "장소 검색";
 
-  return (
-    <Drawer open direction="left" modal={false}>
-      <DrawerContent className="h-full w-80 sm:max-w-80">
-        {/* 헤더 영역: 제목, 설명, 검색 폼 */}
-        <DrawerHeader className="border-border border-b pb-4">
-          {/* 제목 및 공유 버튼 */}
-          <div className="flex items-center justify-between gap-2">
-            <DrawerTitle className="text-base">{titleText}</DrawerTitle>
+  // 마운트 전까지 렌더링 지연 (hydration mismatch 방지)
+  if (isMobile === undefined) return null;
+
+  const DrawerWrapper = isMobile ? MobileDrawer : DesktopDrawer;
+
+  const drawerContent = (
+    <>
+      {/* 헤더 영역: 제목, 설명, 검색 폼 */}
+      <DrawerHeader className="border-border border-b pb-4">
+        {/* 제목 및 공유 버튼 */}
+        <div className="flex items-center justify-between gap-2">
+          <DrawerTitle className="text-base">{titleText}</DrawerTitle>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleShare}
+            aria-label="링크 공유하기"
+          >
+            <Share2 className="size-4" />
+          </Button>
+        </div>
+
+        {/* 설명: 기능 안내 (collapsible) */}
+        <Collapsible>
+          <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              size="icon-sm"
-              onClick={handleShare}
-              aria-label="링크 공유하기"
+              size="sm"
+              className="text-muted-foreground mt-2 flex w-full items-center justify-between px-0 text-xs"
             >
-              <Share2 className="size-4" />
+              <span className="flex items-center gap-1">
+                <Info size={10} />
+                사용 방법 보기
+              </span>
+              <ChevronDown className="size-4 transition-transform [[data-state=open]>&]:rotate-180" />
             </Button>
-          </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <DrawerDescription asChild className="px-2.5">
+              <dl className="text-muted-foreground mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
+                {USAGE_GUIDE.map(({ label, description }) => (
+                  <div key={label} className="contents">
+                    <dt className="flex items-center gap-1 font-medium text-gray-700">
+                      <Info size={10} />
+                      {label}
+                    </dt>
+                    <dd className="text-left">
+                      {typeof description === "function"
+                        ? description(level)
+                        : description}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </DrawerDescription>
+          </CollapsibleContent>
+        </Collapsible>
 
-          {/* 설명: 기능 안내 */}
-          <DrawerDescription asChild>
-            <dl className="text-muted-foreground mt-2 grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
-              <dt className="flex items-center gap-1 font-medium text-gray-700">
-                <Info size={10} />줌 레벨
-              </dt>
-              <dd>현재 {level} (10~12: 시/도, 7~9: 시군구)</dd>
-              <dt className="flex items-center gap-1 font-medium text-gray-700">
-                <Info size={10} />
-                지도 영역
-              </dt>
-              <dd>드래그로 이동, 스크롤로 확대/축소</dd>
-              <dt className="flex items-center gap-1 font-medium text-gray-700">
-                <Info size={10} />
-                폴리곤 클릭
-              </dt>
-              <dd>시/도 → 확대, 시군구 → 검색 시작</dd>
-              <dt className="flex items-center gap-1 font-medium text-gray-700">
-                <Info size={10} />
-                장소 검색
-              </dt>
-              <dd>키워드 입력 후 현재 지도 중심 기준 검색</dd>
-            </dl>
-          </DrawerDescription>
+        {/* 검색 폼 */}
+        <div className="mt-2">
+          <PlaceSearchForm />
+        </div>
+      </DrawerHeader>
 
-          {/* 검색 폼 */}
-          <div className="mt-4">
-            <PlaceSearchForm />
-          </div>
-        </DrawerHeader>
-
-        {/* 검색 결과 리스트 */}
-        <PlaceSearchList />
-      </DrawerContent>
-    </Drawer>
+      {/* 검색 결과 리스트 */}
+      <PlaceSearchList />
+    </>
   );
+
+  return <DrawerWrapper>{drawerContent}</DrawerWrapper>;
 }
 
 export default PlaceSearchLayout;
