@@ -7,6 +7,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   Accordion,
@@ -82,14 +83,17 @@ function PlaceSearchLayout() {
             )}
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleShare}
-            aria-label="링크 공유하기"
-          >
-            <Share2 className="size-4" />
-          </Button>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleShare}
+              aria-label="링크 공유하기"
+            >
+              <Share2 className="size-4" />
+            </Button>
+            <SidebarTrigger />
+          </div>
         </div>
 
         {/* 설명: 기능 안내 (accordion) */}
