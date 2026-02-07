@@ -18,6 +18,7 @@ import PolygonLayer from "./PolygonLayer";
 import PlaceMarker from "../pages/place-search/PlaceMarker";
 import SelectedPlaceOverlay from "../pages/place-search/SelectedPlaceOverlay";
 import type { GeoJSONFeature } from "@/types/shared/geojson.types";
+import { SidebarTrigger, useSidebar } from "../ui/sidebar";
 
 /**
  * 폴리곤의 중심점(centroid) 계산
@@ -96,6 +97,13 @@ export default function KakaoPolygonMap() {
       setSelectedPlace: state.setSelectedPlace,
     }))
   );
+
+  const { state, isMobile } = useSidebar();
+
+  const isSidebarTriggerVisible = useMemo(() => {
+    if (isMobile) return true;
+    return state === "collapsed";
+  }, [state, isMobile]);
 
   // Kakao Maps SDK 로더 상태
   const { loading, error } = useKakaoLoader();
@@ -210,37 +218,48 @@ export default function KakaoPolygonMap() {
   if (loading || error) return null;
 
   return (
-    <Map
-      center={mapCenter}
-      level={mapLevel}
-      style={{ width: "100%", height: "100vh" }}
-      onCreate={handleMapCreate}
-      onZoomChanged={handleZoomChanged}
-      onBoundsChanged={handleBoundsChanged}
-    >
-      {/* 행정구역 폴리곤 레이어 */}
-      {visibleFeatures.map((feature) => (
-        <PolygonLayer
-          key={feature.properties.adm_cd}
-          feature={feature}
-          adminLevel={adminLevel}
-          isSelected={false}
-          onSelect={handlePolygonClick}
-        />
-      ))}
-
-      {/* 장소 검색 결과 마커 */}
-      {places.map((place) => (
-        <PlaceMarker key={place.id} place={place} onSelect={setSelectedPlace} />
-      ))}
-
-      {/* 선택된 장소 정보 오버레이 */}
-      {selectedPlace && (
-        <SelectedPlaceOverlay
-          place={selectedPlace}
-          onClose={handleCloseOverlay}
-        />
+    <>
+      {/* 사이드바 토글 버튼 (지도 위 좌측 상단) */}
+      {isSidebarTriggerVisible && (
+        <SidebarTrigger className="absolute top-4 left-4 z-10 bg-white shadow-md" />
       )}
-    </Map>
+
+      <Map
+        center={mapCenter}
+        level={mapLevel}
+        style={{ width: "100%", height: "100vh" }}
+        onCreate={handleMapCreate}
+        onZoomChanged={handleZoomChanged}
+        onBoundsChanged={handleBoundsChanged}
+      >
+        {/* 행정구역 폴리곤 레이어 */}
+        {visibleFeatures.map((feature) => (
+          <PolygonLayer
+            key={feature.properties.adm_cd}
+            feature={feature}
+            adminLevel={adminLevel}
+            isSelected={false}
+            onSelect={handlePolygonClick}
+          />
+        ))}
+
+        {/* 장소 검색 결과 마커 */}
+        {places.map((place) => (
+          <PlaceMarker
+            key={place.id}
+            place={place}
+            onSelect={setSelectedPlace}
+          />
+        ))}
+
+        {/* 선택된 장소 정보 오버레이 */}
+        {selectedPlace && (
+          <SelectedPlaceOverlay
+            place={selectedPlace}
+            onClose={handleCloseOverlay}
+          />
+        )}
+      </Map>
+    </>
   );
 }

@@ -69,7 +69,7 @@ function PlaceSearchLayout() {
   };
 
   return (
-    <Sidebar collapsible="offcanvas">
+    <Sidebar collapsible="offcanvas" className="absolute">
       {/* 헤더 영역 */}
       <SidebarHeader className="border-b p-4">
         {/* 제목 및 버튼들 */}
