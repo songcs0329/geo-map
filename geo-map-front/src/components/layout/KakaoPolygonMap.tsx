@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Map } from "react-kakao-maps-sdk";
 import { useShallow } from "zustand/shallow";
 import useKakaoLoader from "@/hooks/kakao/useKakaoLoader";
@@ -19,6 +19,7 @@ import PlaceMarker from "../pages/place-search/PlaceMarker";
 import SelectedPlaceOverlay from "../pages/place-search/SelectedPlaceOverlay";
 import type { GeoJSONFeature } from "@/types/shared/geojson.types";
 import { SidebarTrigger, useSidebar } from "../ui/sidebar";
+import { KAKAO_ZOOM_LEVELS } from "@/lib/constants";
 
 /**
  * 폴리곤의 중심점(centroid) 계산
@@ -78,6 +79,7 @@ function calculateCentroid(feature: GeoJSONFeature): {
  */
 export default function KakaoPolygonMap() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // 지도 상태 및 액션 (단일 selector로 통합)
   const { level, bounds, setMap, setLevel, setBounds } = useKakaoMapStore(
@@ -98,7 +100,7 @@ export default function KakaoPolygonMap() {
     }))
   );
 
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, toggleSidebar } = useSidebar();
 
   const isSidebarTriggerVisible = useMemo(() => {
     if (isMobile) return true;
@@ -151,7 +153,9 @@ export default function KakaoPolygonMap() {
       if (currentAdminLevel === "sgg") {
         // 지역명에서 마지막 단어 추출 (예: "서울특별시 마포구" -> "마포구")
         const keyword = feature.properties.adm_nm.split(" ").at(-1);
-        if (keyword) {
+        const query = searchParams.get("query");
+        if (!keyword) return;
+        if (query !== keyword) {
           // 지도 중심 좌표와 함께 검색 파라미터 설정
           const center = map.getCenter();
           const params = new URLSearchParams();
@@ -159,6 +163,11 @@ export default function KakaoPolygonMap() {
           params.set("level", String(currentZoomLevel));
           params.set("x", String(center.getLng()));
           params.set("y", String(center.getLat()));
+
+          // 폴리곤 클릭 시 해당 지역명으로 검색 수행하기 때문에 사이드바 열기
+          if (state === "collapsed") {
+            toggleSidebar();
+          }
 
           router.push(`/?${params.toString()}`);
         }
@@ -168,7 +177,7 @@ export default function KakaoPolygonMap() {
       map.setLevel(currentZoomLevel - 1);
       map.panTo(latlng);
     },
-    [router]
+    [router, searchParams, state, toggleSidebar]
   );
 
   /**
@@ -227,6 +236,8 @@ export default function KakaoPolygonMap() {
       <Map
         center={mapCenter}
         level={mapLevel}
+        minLevel={KAKAO_ZOOM_LEVELS.SIDO.max}
+        maxLevel={KAKAO_ZOOM_LEVELS.SGG.min}
         style={{ width: "100%", height: "100vh" }}
         onCreate={handleMapCreate}
         onZoomChanged={handleZoomChanged}
