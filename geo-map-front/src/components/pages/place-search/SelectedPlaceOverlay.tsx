@@ -2,10 +2,9 @@
 
 import { memo, useCallback } from "react";
 import { CustomOverlayMap } from "react-kakao-maps-sdk";
-import { MapPin, Phone, ExternalLink, X } from "lucide-react";
+import { Phone, ExternalLink, X, MapPin } from "lucide-react";
 import {
   Item,
-  ItemMedia,
   ItemContent,
   ItemTitle,
   ItemDescription,
@@ -44,11 +43,6 @@ const SelectedPlaceOverlay = memo(function SelectedPlaceOverlay({
         size="sm"
         className="bg-background relative w-64 shadow-lg"
       >
-        {/* 아이콘 */}
-        <ItemMedia variant="icon">
-          <MapPin className="text-primary" />
-        </ItemMedia>
-
         {/* 장소 정보 */}
         <ItemContent>
           <div className="flex items-center justify-between gap-2">
@@ -81,9 +75,10 @@ const SelectedPlaceOverlay = memo(function SelectedPlaceOverlay({
               </Button>
             </ItemActions>
           </div>
-          <ItemDescription className="truncate">
-            {place.road_address_name || place.address_name}
-          </ItemDescription>
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
+            <MapPin className="size-3" />
+            <span>{place.road_address_name || place.address_name}</span>
+          </div>
           {place.phone && (
             <div className="text-muted-foreground flex items-center gap-1 text-xs">
               <Phone className="size-3" />
