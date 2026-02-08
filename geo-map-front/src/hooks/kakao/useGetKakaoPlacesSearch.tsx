@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { KakaoPlace, PlaceSearchSort } from "@/types/kakao-places.types";
-import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { DEFAULT_PAGE_SIZE, KAKAO_ZOOM_LEVELS } from "@/lib/constants";
+import useKakaoMapStore from "@/stores/useKakaoMapStore";
 
 /**
  * 카카오 Places API 응답 메타데이터
@@ -134,8 +135,11 @@ const searchPlaces = (params: {
 export function useGetKakaoPlacesSearch() {
   const searchParams = useSearchParams();
 
+  const map = useKakaoMapStore((state) => state.map);
+
   // searchParams에서 검색 조건 추출
   const query = searchParams.get("query") ?? "";
+  const level = searchParams.get("level") ?? undefined;
   const x = searchParams.get("x") ?? undefined;
   const y = searchParams.get("y") ?? undefined;
   const sort = (searchParams.get("sort") as PlaceSearchSort) ?? "accuracy";
@@ -177,6 +181,25 @@ export function useGetKakaoPlacesSearch() {
   // 모든 페이지의 장소 목록 병합
   const places = data?.pages.flatMap((page) => page.places) ?? [];
   const totalCount = data?.pages[0]?.meta.total_count ?? 0;
+
+  /**
+   * 검색 성공 시 첫 번째 결과 위치로 지도 이동
+   * - URL에 level/x/y가 이미 있으면(hasMapSearchParams) 이동하지 않음
+   * - firstPlace가 변경될 때만 실행 (무한 스크롤 페이지 추가 시에는 미실행)
+   */
+  const firstPlace = data?.pages[0]?.places[0];
+  const hasMapSearchParams = !!(level && x && y);
+
+  useEffect(() => {
+    if (!map || !firstPlace || hasMapSearchParams) return;
+
+    const moveLatLng = new kakao.maps.LatLng(
+      Number(firstPlace.y),
+      Number(firstPlace.x)
+    );
+    map.setLevel(KAKAO_ZOOM_LEVELS.SGG.max);
+    map.setCenter(moveLatLng);
+  }, [map, firstPlace, hasMapSearchParams]);
 
   /**
    * 지도 이동 시 재검색 트리거
