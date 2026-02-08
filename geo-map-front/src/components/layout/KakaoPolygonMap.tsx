@@ -154,23 +154,27 @@ export default function KakaoPolygonMap() {
         // 지역명에서 마지막 단어 추출 (예: "서울특별시 마포구" -> "마포구")
         const keyword = feature.properties.adm_nm.split(" ").at(-1);
         const query = searchParams.get("query");
+
         if (!keyword) return;
-        if (query !== keyword) {
-          // 지도 중심 좌표와 함께 검색 파라미터 설정
-          const center = map.getCenter();
-          const params = new URLSearchParams();
-          params.set("query", keyword);
-          params.set("level", String(currentZoomLevel));
-          params.set("x", String(center.getLng()));
-          params.set("y", String(center.getLat()));
 
-          // 폴리곤 클릭 시 해당 지역명으로 검색 수행하기 때문에 사이드바 열기
-          if (state === "collapsed") {
-            toggleSidebar();
-          }
+        // 지도 중심 좌표와 함께 검색 파라미터 설정
+        const center = map.getCenter();
+        const params = new URLSearchParams();
+        params.set("query", keyword);
+        params.set("level", String(currentZoomLevel));
+        params.set("x", String(center.getLng()));
+        params.set("y", String(center.getLat()));
 
-          router.push(`/?${params.toString()}`);
+        /**
+         * 폴리곤 클릭 시 사이드바 닫혀있고
+         * searchParams의 query(현 지역명)과 keyword(target 지역명)을 비교해서
+         * 다를 경우 사이드바 열기
+         */
+        if (state === "collapsed" && keyword !== query) {
+          toggleSidebar();
         }
+
+        router.push(`/?${params.toString()}`);
       }
 
       // 확대 및 이동
