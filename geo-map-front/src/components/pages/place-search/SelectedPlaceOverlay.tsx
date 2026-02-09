@@ -7,7 +7,6 @@ import {
   Item,
   ItemContent,
   ItemTitle,
-  ItemDescription,
   ItemActions,
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
