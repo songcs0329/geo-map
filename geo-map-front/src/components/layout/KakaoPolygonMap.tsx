@@ -201,13 +201,13 @@ export default function KakaoPolygonMap() {
 
   /**
    * 줌 레벨 변경 시 호출되는 콜백
+   * - bounds는 줌 시 함께 발생하는 onBoundsChanged에서 갱신 (중복 렌더 방지)
    */
   const handleZoomChanged = useCallback(
     (map: kakao.maps.Map) => {
       setLevel(map.getLevel());
-      setBounds(map.getBounds());
     },
-    [setLevel, setBounds]
+    [setLevel]
   );
 
   /**
