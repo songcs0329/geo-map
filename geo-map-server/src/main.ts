@@ -9,7 +9,7 @@ async function bootstrap() {
   // Enable gzip compression for all responses
   app.use(compression());
 
-  const CORS_ORIGINS = [process.env.CORS_ORIGINS];
+  const CORS_ORIGINS = (process.env.CORS_ORIGINS ?? '').split(',').map((o) => o.trim());
 
   app.enableCors({
     origin: CORS_ORIGINS,
