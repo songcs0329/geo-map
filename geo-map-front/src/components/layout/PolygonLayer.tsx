@@ -2,10 +2,7 @@
 
 import { useState, useMemo, memo } from "react";
 import { Polygon } from "react-kakao-maps-sdk";
-import {
-  createDistrictStyles,
-  convertCoordinatesToPaths,
-} from "@/lib/kakaoMapUtils";
+import { createDistrictStyles } from "@/lib/kakaoMapUtils";
 import type { GeoJSONFeature, AdminLevel } from "@/types/shared/geojson.types";
 
 interface PolygonLayerProps {
@@ -34,13 +31,13 @@ const PolygonLayer = memo(function PolygonLayer({
       : styles.style;
 
   const paths = useMemo(() => {
-    const converted = convertCoordinatesToPaths(
-      feature.geometry.coordinates,
-      feature.geometry.type
-    );
-    return converted.map((ring) =>
-      ring.map((coord) => ({ lat: coord.getLat(), lng: coord.getLng() }))
-    );
+    // GeoJSON [lng, lat] → {lat, lng} 직접 변환 (kakao.maps.LatLng 중간 생성 없음)
+    const { type, coordinates } = feature.geometry;
+    const rings =
+      type === "Polygon"
+        ? (coordinates as number[][][])
+        : (coordinates as number[][][][]).flat();
+    return rings.map((ring) => ring.map(([lng, lat]) => ({ lat, lng })));
   }, [feature]);
 
   return (
