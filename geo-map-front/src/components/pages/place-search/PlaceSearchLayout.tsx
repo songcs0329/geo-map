@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { Info, Share2 } from "lucide-react";
 import { useShallow } from "zustand/shallow";
@@ -45,6 +46,12 @@ const USAGE_GUIDE = [
 function PlaceSearchLayout() {
   const searchParams = useSearchParams();
   const { places, totalCount } = useGetKakaoPlacesSearch();
+  // ponytail: Radix useId 하이드레이션 불일치 회피용 — 서버 false, 클라이언트 true
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   // 현재 검색어
   const query = searchParams.get("query");
@@ -97,6 +104,7 @@ function PlaceSearchLayout() {
         </div>
 
         {/* 설명: 기능 안내 (accordion) */}
+        {mounted && (
         <Accordion type="single" collapsible>
           <AccordionItem value="usage-guide" className="border-none">
             <AccordionTrigger className="text-muted-foreground py-2 text-xs hover:no-underline">
@@ -124,6 +132,7 @@ function PlaceSearchLayout() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        )}
 
         {/* 검색 폼 */}
         <PlaceSearchForm />
